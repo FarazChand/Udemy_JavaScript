@@ -185,8 +185,6 @@ console.log(century);
 //////////////////////////////////////
 
 
-*/
-
 // Coding Challenge #1, #2:
 
 //Test Data 1:
@@ -231,3 +229,270 @@ console.log(markBMI, johnBMI);
 testing();
 
 //////////////////////////////////////
+
+
+////Type Conversion
+
+// Converting strings to numbers
+const inputYear = "1991";
+console.log(Number(inputYear), inputYear);
+console.log(Number(inputYear) + 18);
+// Number function just gives us the string in number form, does not change the original variable
+
+console.log(Number("Faraz")); // will produce NaN aka not a number
+console.log(typeof NaN); // will say the type of number, it's actually an invalid number
+
+// Converting numbers to strings
+console.log(String(23), 23);
+
+////Type Coercion
+console.log("I am " + 23 + " years old"); // operator triggers type coercion, 23 changed to string in this occasion
+console.log("I am " + "23" + " years old"); // produces the same output as above
+
+console.log("23" + "10" + 3); // + operator converts numbers to strings
+
+console.log("23" - "10" - 3); // - operator coverts string to numbers, opposite of the +
+console.log("23" * "2"); // also converted to numbers, works this way with / as well
+console.log("23" > "18"); // also converts to numbers
+
+let n = "1" + 1;
+n = n - 1;
+console.log(n);
+
+//////////////////////////////////////
+
+// 5 falsy values: 0, '', undefined, null, NaN
+// Everything else is a truthy value
+
+console.log(Boolean(0)); // outputs false with the type of boolean
+console.log(Boolean(undefined)); // outputs false with the type of boolean
+console.log(Boolean("Faraz")); // outputs true with the type of boolean
+console.log(Boolean({})); // outputs true?? with the type of boolean (not one of the 5)
+console.log(Boolean("")); // outputs false with the type of boolean
+
+// const money = 0; //fails if statement
+const money = 200; //passes if statement, any number that is not 0 passes.
+
+if (money) {
+   console.log(`Don't spend it all ;)`);
+} else {
+   console.log(`You should get a job!`);
+}
+
+// let height; // will fail if statement
+// let height = 123; // will pass if statement
+let height = 0; // will fail if statement, but is defined - this is a bug
+
+if (height) {
+   console.log(`YAY! Height is defined`);
+} else {
+   console.log(`Height is UNDEFINED`);
+}
+// in an if condition, JS coerces any value into a boolean
+
+//////////////////////////////////////
+
+
+// // = assignment
+// // == loose comparison, does perform type coercion
+// //=== strict comparison, does not perform type coercion
+
+// // const age = 18;
+// const age = "18";
+
+// if (age === 18) console.log("You just became an adult :D (strict)");
+// if (age == 18) console.log("You just became an adult :D (loose)");
+
+// console.log("18" == 18); //output is true, type coercion
+// console.log("18" === 18); //output is false, no type coercion
+// // generally avoid the loose comparison as it introduces a lot of bugs sometimes
+
+// // const favorite = prompt("What's your favorite number?"); // for loose example
+// const favorite = Number(prompt("What's your favorite number?")); // for strict example
+
+// console.log(favorite);
+// console.log(typeof favorite);
+
+// // if (favorite == 23) {
+// //    // this works because of type coercion, but we dont want that
+// //    // '23' == 23
+// //    console.log(`Cool, 23 is an amazing number`);
+// // }
+// // the strict === would not work with this logic, must convert the input to number
+
+// if (favorite === 23) {
+//    // 23 == 23
+//    console.log(`Cool, 23 is an amazing number`);
+// } else if (favorite === 8) {
+//    console.log(`8 is also is an amazing number`);
+// } else if (favorite === 24) {
+//    console.log(`24 is also is an amazing number`);
+// } else {
+//    console.log(`Your number sucks 💩`);
+// }
+
+// if (favorite !== 23) {
+//    // the different operator, strict version
+//    console.log(`Why not 23?`);
+// }
+
+//////////////////////////////////////
+
+const hasDriversLicense = true; // A
+let hasGoodVision = false; // B
+
+console.log(hasDriversLicense && hasGoodVision); //false
+console.log(hasDriversLicense || hasGoodVision); //true
+console.log(!hasDriversLicense); // false
+
+hasDriversLicense && hasGoodVision;
+
+// if (hasDriversLicense && hasGoodVision) {
+//    console.log(`Sarah is able to drive!`);
+// } else {
+//    console.log(`Someone else should drive.`); // will trigger else
+// }
+
+const isTired = false; // C
+console.log(hasDriversLicense || hasGoodVision || isTired); // true
+console.log(hasDriversLicense && hasGoodVision && isTired); // false
+
+hasGoodVision = true;
+
+if (hasDriversLicense && hasGoodVision && !isTired) {
+   console.log(`Sarah is able to drive!`); // will pass if statement, all variables true
+} else {
+   console.log(`Someone else should drive.`);
+}
+
+//////////////////////////////////////
+
+
+// Coding Challenge #3
+
+//Test Data #1
+
+// Dolphins scores
+let a = 96;
+let b = 108;
+let c = 89;
+// Koalas scores
+let d = 88;
+let e = 91;
+let f = 110;
+
+let dolphinAvgScore;
+let koalasAvgScore;
+
+function scores() {
+   dolphinAvgScore = Math.round(((a + b + c) / 3) * 10) / 10;
+   koalasAvgScore = Math.round(((d + e + f) / 3) * 10) / 10;
+}
+function winner() {
+   if (dolphinAvgScore > koalasAvgScore && dolphinAvgScore >= 100) {
+      console.log(
+         `The final score is: D - ${dolphinAvgScore} to K - ${koalasAvgScore}. Dolphins win!`
+      );
+   } else if (dolphinAvgScore < koalasAvgScore && koalasAvgScore >= 100) {
+      console.log(
+         `The final score is: D - ${dolphinAvgScore} to K - ${koalasAvgScore}. Koalas win!`
+      );
+   } else if (dolphinAvgScore === koalasAvgScore && dolphinAvgScore >= 100) {
+      console.log(
+         `The final score is: D - ${dolphinAvgScore} to K - ${koalasAvgScore}. It's a tie!`
+      );
+   } else {
+      console.log(`No one got a score over 100, so no one wins.`);
+   }
+}
+
+scores();
+winner();
+
+//Test Data #2
+
+// Dolphins scores
+a = 97;
+b = 112;
+c = 101;
+// Koalas scores
+d = 109;
+e = 95;
+f = 123;
+
+scores();
+winner();
+
+//Test Data #3
+
+// Dolphins scores
+a = 97;
+b = 112;
+c = 101;
+// Koalas scores
+d = 109;
+e = 95;
+f = 106;
+
+scores();
+winner();
+
+// Test Data #4
+
+// Dolphins scores
+a = 20;
+b = 30;
+c = 41;
+// Koalas scores
+d = 20;
+e = 30;
+f = 40;
+
+scores();
+winner();
+
+//////////////////////////////////////
+
+const day = "monday";
+
+// switch (day) {
+//    case "monday": // day === 'monday'
+//       console.log(`Plan course structure`);
+//       console.log(`Go to coding meetup`);
+//       break;
+//    case "tuesday":
+//       console.log(`Prepare theory videos`);
+//       break;
+//    case "wednesday":
+//    case "thursday":
+//       console.log(`Write code examples`);
+//       break;
+//    case "friday":
+//       console.log(`Record videos`);
+//       break;
+//    case "saturday":
+//    case "sunday":
+//       console.log(`Enjoy the weekend :D`);
+//       break;
+//    default:
+//       console.log(`Not a valid day!`);
+// }
+
+if (day === "monday") {
+   console.log(`Plan course structure`);
+   console.log(`Go to coding meetup`);
+} else if (day === "tuesday") {
+   console.log(`Prepare theory videos`);
+} else if (day === "wednesday" || day === "thursday") {
+   console.log(`Write code examples`);
+} else if (day === "friday") {
+   console.log(`Record videos`);
+} else if (day === "saturday" || day === "sunday") {
+   console.log(`Enjoy the weekend :D`);
+} else {
+   console.log(`Not a valid day!`);
+}
+
+//////////////////////////////////////
+
+*/
