@@ -120,25 +120,38 @@
 
 // 7. The Switch Statement
 
-const language = "arabic";
+// const language = "arabic";
 
-switch (language) {
-   case "chinese":
-   case "mandarin":
-      console.log(`MOST number of native speakers!`);
-      break;
-   case "spanish":
-      console.log(`2nd place in number of native speakers`);
-      break;
-   case "english":
-      console.log(`3rd place`);
-      break;
-   case "hindi":
-      console.log(`Number 4`);
-      break;
-   case "arabic":
-      console.log(`5th most spoken language`);
-      break;
-   default:
-      console.log(`Great language too :D`);
-}
+// switch (language) {
+//    case "chinese":
+//    case "mandarin":
+//       console.log(`MOST number of native speakers!`);
+//       break;
+//    case "spanish":
+//       console.log(`2nd place in number of native speakers`);
+//       break;
+//    case "english":
+//       console.log(`3rd place`);
+//       break;
+//    case "hindi":
+//       console.log(`Number 4`);
+//       break;
+//    case "arabic":
+//       console.log(`5th most spoken language`);
+//       break;
+//    default:
+//       console.log(`Great language too :D`);
+// }
+
+// 8. The Conditional Ternary Operator
+
+const country = "Canada";
+const population = "39";
+
+// population > 38
+//    ? console.log(`${country}'s population is above average.`)
+//    : console.log(`${country}'s population is below average.`);
+
+console.log(
+   `${country}'s population is ${population > 38 ? "above" : "below"} average.`
+);
