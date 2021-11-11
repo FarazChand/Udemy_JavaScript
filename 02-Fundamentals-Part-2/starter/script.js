@@ -75,16 +75,76 @@
 
 ////////////////////////////////////////////////////////////////
 
-function cutFruitPieces(fruit) {
-   return fruit * 4;
-}
+// function cutFruitPieces(fruit) {
+//    return fruit * 4;
+// }
 
-function fruitProcessor(apples, oranges) {
-   const applePieces = cutFruitPieces(apples);
-   const orangePieces = cutFruitPieces(oranges);
+// function fruitProcessor(apples, oranges) {
+//    const applePieces = cutFruitPieces(apples);
+//    const orangePieces = cutFruitPieces(oranges);
 
-   const juice = `Juice with ${applePieces} pieces of apples and ${orangePieces} pieces of oranges.`;
-   return juice;
-}
+//    const juice = `Juice with ${applePieces} pieces of apples and ${orangePieces} pieces of oranges.`;
+//    return juice;
+// }
 
-console.log(fruitProcessor(2, 3));
+// console.log(fruitProcessor(2, 3));
+
+////////////////////////////////////////////////////////////////
+
+//Arrow function
+
+// const calcAge = function (birthYear) {
+//    return 2037 - birthYear;
+// };
+
+// const yearUntilRetirement = function (birthYear, firstName) {
+//    const age = calcAge(birthYear);
+//    const retirement = 65 - age;
+
+//    if (retirement > 0) {
+//       console.log(`${firstName} retires in ${retirement} years`);
+//       return retirement;
+//    } else {
+//       console.log(`${firstName} has already retired 🎉`);
+//       return -1;
+//    }
+
+//    // return `${firstName} retires in ${retirement} years`;
+// };
+
+// console.log(yearUntilRetirement(1991, "Bob"));
+// console.log(yearUntilRetirement(1950, "Mike"));
+
+////////////////////////////////////////////////////////////////
+
+// Coding Challenge #1
+
+// function calcAverage(score1, score2, score3) {
+//    return (score1 + score2 + score3) / 3;
+// }
+const calcAverage = (score1, score2, score3) => (score1 + score2 + score3) / 3;
+
+//Data 1
+const avgDolphins1 = calcAverage(44, 23, 71);
+const avgKoalas1 = calcAverage(65, 54, 49);
+//Data 2
+const avgDolphins2 = calcAverage(85, 54, 41);
+const avgKoalas2 = calcAverage(23, 34, 27);
+
+const checkWinner = function (avgDolphins, avgKoalas) {
+   if (avgDolphins >= avgKoalas * 2) {
+      console.log(`Dolphins win (${avgDolphins} vs ${avgKoalas})`);
+      return 100;
+   } else if (avgKoalas >= avgDolphins * 2) {
+      console.log(`Koalas win (${avgKoalas} vs. ${avgDolphins} )`);
+      return 200;
+   } else {
+      console.log(`Ignored`);
+      return 0;
+   }
+};
+
+const data1 = checkWinner(avgDolphins1, avgKoalas1);
+const data2 = checkWinner(avgDolphins2, avgKoalas2);
+
+console.log(data1, data2);
