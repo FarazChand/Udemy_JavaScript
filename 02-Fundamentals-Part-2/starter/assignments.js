@@ -64,19 +64,58 @@
 
 // 4. Functions calling Other Functions
 
-function percentageOfWorld1(population) {
-   return (population / 7900) * 100;
+// function percentageOfWorld1(population) {
+//    return (population / 7900) * 100;
+// }
+
+// // const describePopulation3 = (country, population) => {};
+// // function describePopulation2(country, population){};
+
+// const describePopulation1 = function (country, population) {
+//    const percentagePopulation = percentageOfWorld1(population);
+
+//    return `${country} has ${population} million people, which is about ${percentagePopulation}% of the world`;
+// };
+
+// console.log(describePopulation1(`Canada`, 38));
+// console.log(describePopulation1(`US`, 330));
+// console.log(describePopulation1(`Finland`, 6));
+
+// 5. Introduction to Arrays
+
+// const populations = [38, 330, 6, 1402];
+
+// console.log(populations.length === 4);
+
+// function percentageOfWorld(population) {
+//    return (population / 7900) * 100;
+// }
+
+// const percentages = [
+//    percentageOfWorld(populations[0]),
+//    percentageOfWorld(populations[1]),
+//    percentageOfWorld(populations[2]),
+//    percentageOfWorld(populations[populations.length - 1]),
+// ];
+
+// console.log(percentages);
+
+// 6. Basic Array Operations(Methods)
+
+const neighbours = [`USA`, `Mexico`, `NP`];
+console.log(neighbours);
+
+neighbours.push(`Utopia`);
+console.log(neighbours);
+
+neighbours.pop();
+console.log(neighbours);
+
+if (!neighbours.includes(`Germany`)) {
+   console.log(`Probably not a European country :D`);
+} else {
+   console.log(`Must be a European country :D`);
 }
 
-// const describePopulation3 = (country, population) => {};
-// function describePopulation2(country, population){};
-
-const describePopulation1 = function (country, population) {
-   const percentagePopulation = percentageOfWorld1(population);
-
-   return `${country} has ${population} million people, which is about ${percentagePopulation}% of the world`;
-};
-
-console.log(describePopulation1(`Canada`, 38));
-console.log(describePopulation1(`US`, 330));
-console.log(describePopulation1(`Finland`, 6));
+neighbours[neighbours.length - 1] = `North Pole`;
+console.log(neighbours);

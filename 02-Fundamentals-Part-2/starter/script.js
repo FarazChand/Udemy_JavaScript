@@ -119,32 +119,155 @@
 
 // Coding Challenge #1
 
-// function calcAverage(score1, score2, score3) {
-//    return (score1 + score2 + score3) / 3;
+// // function calcAverage(score1, score2, score3) {
+// //    return (score1 + score2 + score3) / 3;
+// // }
+// const calcAverage = (score1, score2, score3) => (score1 + score2 + score3) / 3;
+
+// //Data 1
+// const avgDolphins1 = calcAverage(44, 23, 71);
+// const avgKoalas1 = calcAverage(65, 54, 49);
+// //Data 2
+// const avgDolphins2 = calcAverage(85, 54, 41);
+// const avgKoalas2 = calcAverage(23, 34, 27);
+
+// const checkWinner = function (avgDolphins, avgKoalas) {
+//    if (avgDolphins >= avgKoalas * 2) {
+//       console.log(`Dolphins win (${avgDolphins} vs ${avgKoalas})`);
+//       return 100;
+//    } else if (avgKoalas >= avgDolphins * 2) {
+//       console.log(`Koalas win (${avgKoalas} vs. ${avgDolphins} )`);
+//       return 200;
+//    } else {
+//       console.log(`Ignored`);
+//       return 0;
+//    }
+// };
+
+// const data1 = checkWinner(avgDolphins1, avgKoalas1);
+// const data2 = checkWinner(avgDolphins2, avgKoalas2);
+
+// console.log(data1, data2);
+
+////////////////////////////////////////////////////////////////
+
+// const friend1 = `Michael`;
+// const friend2 = `Steven`;
+// const friend3 = `Peter`;
+
+// const friends = [`Michael`, `Steven`, `Peter`];
+// console.log(friends);
+
+// const y = new Array(1991, 1984, 2008, 2020);
+
+// console.log(friends[0]);
+// console.log(friends[2]);
+
+// console.log(friends.length);
+// console.log(friends[friends.length - 1]);
+
+// friends[2] = `Jay`;
+// console.log(friends);
+
+// // cant reassign the array itself but you can reassign the individual elements
+// // friends = [`Bob`, `Alice`]; - can't do this
+// const firstName = `Faraz`;
+// const faraz = [firstName, `Chand`, 2037 - 1993, `teacher`, friends];
+
+// console.log(faraz);
+// console.log(faraz.length);
+
+// // Exercise
+
+// const calcAge = function (birthYear) {
+//    return 2037 - birthYear;
+// };
+
+// const years = [1990, 1967, 2002, 2010, 2018];
+
+// // console.log(calcAge(years));  - can't do this
+
+// const age1 = calcAge(years[0]);
+// const age2 = calcAge(years[1]);
+// const age3 = calcAge(years[years.length - 1]);
+
+// console.log(age1, age2, age3);
+
+// const ages = [
+//    calcAge(years[0]),
+//    calcAge(years[1]),
+//    calcAge(years[years.length - 1]),
+// ];
+
+// console.log(ages);
+
+////////////////////////////////////////////////////////////////
+
+// const friends = [`Michael`, `Steven`, `Peter`];
+
+// // Add elements
+// const newLength = friends.push(`Jay`);
+// console.log(friends);
+// console.log(newLength);
+
+// friends.unshift(`John`);
+// console.log(friends);
+
+// // Remove elements
+// friends.pop(); // Removes Last
+// const popped = friends.pop(); // Returns removed element
+// console.log(popped);
+// console.log(friends);
+
+// friends.shift(); // Removes First, returns removed element as well
+// console.log(friends);
+
+// //Finding index
+// console.log(friends.indexOf(`Steven`)); //returns the index of the element in the array
+// console.log(friends.indexOf(`Bob`)); // returns -1, element does not exist
+
+// friends.push(23);
+// console.log(friends.includes(`Steven`)); // returns true or false based on if element exists in array
+// console.log(friends.includes(`Bob`)); // will return false
+// console.log(friends.includes(`23`)); // will return false because it uses strict =,23 !== '23'
+// console.log(friends.includes(23)); // returns true
+
+// if (friends.includes(`Steven`)) {
+//    console.log(`You have a friend called Steven`);
 // }
-const calcAverage = (score1, score2, score3) => (score1 + score2 + score3) / 3;
 
-//Data 1
-const avgDolphins1 = calcAverage(44, 23, 71);
-const avgKoalas1 = calcAverage(65, 54, 49);
-//Data 2
-const avgDolphins2 = calcAverage(85, 54, 41);
-const avgKoalas2 = calcAverage(23, 34, 27);
+////////////////////////////////////////////////////////////////
 
-const checkWinner = function (avgDolphins, avgKoalas) {
-   if (avgDolphins >= avgKoalas * 2) {
-      console.log(`Dolphins win (${avgDolphins} vs ${avgKoalas})`);
-      return 100;
-   } else if (avgKoalas >= avgDolphins * 2) {
-      console.log(`Koalas win (${avgKoalas} vs. ${avgDolphins} )`);
-      return 200;
-   } else {
-      console.log(`Ignored`);
-      return 0;
-   }
-};
+// Coding Challenge #2
 
-const data1 = checkWinner(avgDolphins1, avgKoalas1);
-const data2 = checkWinner(avgDolphins2, avgKoalas2);
+// const bill = 100;
+const bills = [125, 555, 44];
 
-console.log(data1, data2);
+// function calcTip(bill) {
+//    if (bill >= 50 && bill <= 300) {
+//       // console.log(bill * 0.15);
+//       return bill * 0.15;
+//    } else {
+//       // console.log(bill * 0.2);
+//       return bill * 0.2;
+//    }
+// }
+
+const calcTip = (bill) =>
+   bill >= 50 && bill <= 300 ? bill * 0.15 : bill * 0.2;
+
+const calcTotal = (bill, tip) => bill + tip;
+
+// calcTip(bill);
+
+const tips = [calcTip(bills[0]), calcTip(bills[1]), calcTip(bills[2])];
+console.log(bills);
+console.log(tips);
+
+// const total = [bills[0] + tips[0], bills[1] + tips[1], bills[2] + tips[2]];
+const total = [
+   calcTotal(bills[0], tips[0]),
+   calcTotal(bills[1], tips[1]),
+   calcTotal(bills[2], tips[2]),
+];
+console.log(total);
