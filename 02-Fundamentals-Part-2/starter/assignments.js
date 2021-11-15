@@ -102,20 +102,47 @@
 
 // 6. Basic Array Operations(Methods)
 
-const neighbours = [`USA`, `Mexico`, `NP`];
-console.log(neighbours);
+// const neighbours = [`USA`, `Mexico`, `NP`];
+// console.log(neighbours);
 
-neighbours.push(`Utopia`);
-console.log(neighbours);
+// neighbours.push(`Utopia`);
+// console.log(neighbours);
 
-neighbours.pop();
-console.log(neighbours);
+// neighbours.pop();
+// console.log(neighbours);
 
-if (!neighbours.includes(`Germany`)) {
-   console.log(`Probably not a European country :D`);
-} else {
-   console.log(`Must be a European country :D`);
-}
+// if (!neighbours.includes(`Germany`)) {
+//    console.log(`Probably not a European country :D`);
+// } else {
+//    console.log(`Must be a European country :D`);
+// }
 
-neighbours[neighbours.length - 1] = `North Pole`;
-console.log(neighbours);
+// neighbours[neighbours.length - 1] = `North Pole`;
+// console.log(neighbours);
+
+// 7. Introduction to Objects
+
+const myCountry = {
+   country: `Canada`,
+   capital: `Ottowa`,
+   language: `English`,
+   population: 38,
+   neighbors: [`US`, `Mexico`, `NP`],
+};
+
+console.log(myCountry);
+
+// 8. Dot vs Bracket Notation
+
+console.log(
+   `${myCountry.country} has ${myCountry.population} million ${myCountry.language} speaking people, ${myCountry.neighbors.length} neighbouring countries and a capital called ${myCountry.capital}.`
+);
+
+// myCountry.population = Number.parseInt(myCountry.population) + 2;
+// myCountry.population = myCountry[`population`] - 2;
+myCountry.population += 2;
+console.log(myCountry.population);
+
+// myCountry[`population`] = 36;
+myCountry[`population`] -= 2;
+console.log(myCountry.population);

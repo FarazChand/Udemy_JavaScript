@@ -238,36 +238,105 @@
 
 ////////////////////////////////////////////////////////////////
 
-// Coding Challenge #2
+// // Coding Challenge #2
 
-// const bill = 100;
-const bills = [125, 555, 44];
+// // const bill = 100;
+// const bills = [125, 555, 44];
 
-// function calcTip(bill) {
-//    if (bill >= 50 && bill <= 300) {
-//       // console.log(bill * 0.15);
-//       return bill * 0.15;
-//    } else {
-//       // console.log(bill * 0.2);
-//       return bill * 0.2;
-//    }
-// }
+// // function calcTip(bill) {
+// //    if (bill >= 50 && bill <= 300) {
+// //       // console.log(bill * 0.15);
+// //       return bill * 0.15;
+// //    } else {
+// //       // console.log(bill * 0.2);
+// //       return bill * 0.2;
+// //    }
+// // }
 
-const calcTip = (bill) =>
-   bill >= 50 && bill <= 300 ? bill * 0.15 : bill * 0.2;
+// const calcTip = (bill) =>
+//    bill >= 50 && bill <= 300 ? bill * 0.15 : bill * 0.2;
 
-const calcTotal = (bill, tip) => bill + tip;
+// const calcTotal = (bill, tip) => bill + tip;
 
-// calcTip(bill);
+// // calcTip(bill);
 
-const tips = [calcTip(bills[0]), calcTip(bills[1]), calcTip(bills[2])];
-console.log(bills);
-console.log(tips);
+// const tips = [calcTip(bills[0]), calcTip(bills[1]), calcTip(bills[2])];
+// console.log(bills);
+// console.log(tips);
 
-// const total = [bills[0] + tips[0], bills[1] + tips[1], bills[2] + tips[2]];
-const total = [
-   calcTotal(bills[0], tips[0]),
-   calcTotal(bills[1], tips[1]),
-   calcTotal(bills[2], tips[2]),
+// // const total = [bills[0] + tips[0], bills[1] + tips[1], bills[2] + tips[2]];
+// const total = [
+//    calcTotal(bills[0], tips[0]),
+//    calcTotal(bills[1], tips[1]),
+//    calcTotal(bills[2], tips[2]),
+// ];
+// console.log(total);
+
+////////////////////////////////////////////////////////////////
+
+// storing related values in an array
+const farazArray = [
+   `Faraz`,
+   `Chand`,
+   2037 - 1993,
+   `teacher`,
+   [`Michael`, `Peter`, `Steven`],
 ];
-console.log(total);
+console.log(farazArray);
+
+//storing related values in an object using value pairs, object literal syntax
+const faraz = {
+   firstName: `Faraz`,
+   lastName: `Chand`,
+   age: 2037 - 1993,
+   job: `teacher`,
+   friends: [`Michael`, `Peter`, `Steven`],
+};
+console.log(faraz);
+
+//Retrieving Data from objects - using dot notation
+
+console.log(faraz.lastName);
+console.log(faraz.firstName);
+
+//Retrieving Data from objects - using using bracket notation
+
+console.log(faraz[`lastName`]);
+console.log(faraz[`firstName`]);
+
+// Bracket notation can use any expression that results in a property, don't have to explicity write the string
+const nameKey = `Name`;
+console.log(faraz[`first` + nameKey]);
+console.log(faraz[`last` + nameKey]);
+
+// cannot use expressions in dot notation
+// console.log(faraz.`last` + nameKey); // wont work
+
+const interestedIn = prompt(
+   `What do you want to know about Faraz? Choose between firstName, lastName, age, job, and friends`
+);
+console.log(interestedIn);
+console.log(faraz.interestedIn); // will produce undefined, value does not exist
+
+if (faraz[interestedIn]) {
+   console.log(faraz[interestedIn]);
+} else {
+   console.log(
+      `Wrong request! Choose between firstName, lastName, age, job, and friends`
+   );
+}
+
+// adding properties to an object
+faraz.location = `Canada`;
+faraz[`twitter`] = `@farazChand`;
+console.log(faraz.location);
+console.log(faraz.twitter);
+
+//Challenge
+//"Faraz has 3 friends, and his best friend is Michael"
+
+console.log(
+   `${faraz.firstName} has ${
+      faraz[`friends`].length
+   } friends, and his best friend is called '${faraz.friends[0]}'`
+);
