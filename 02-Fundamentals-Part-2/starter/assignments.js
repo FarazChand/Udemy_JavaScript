@@ -229,3 +229,18 @@
 //       console.log(`Neighbour #${(i + 1) * (j + 1)}: ${listOfNeighbours[i][j]}`);
 //    }
 // }
+
+const listOfNeighbours = [
+   [`Canada`, `Mexico`],
+   [`Spain`],
+   [`Norway`, `Sweden`, `Russia`],
+];
+
+let x = 1;
+
+for (let i = 0; i < listOfNeighbours.length; i++) {
+   for (let j = 0; j < listOfNeighbours[i].length; j++) {
+      console.log(`Neighbor #${x}: ${listOfNeighbours[i][j]}`);
+      x++;
+   }
+}
