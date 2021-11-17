@@ -122,27 +122,110 @@
 
 // 7. Introduction to Objects
 
-const myCountry = {
-   country: `Canada`,
-   capital: `Ottowa`,
-   language: `English`,
-   population: 38,
-   neighbors: [`US`, `Mexico`, `NP`],
-};
+// const myCountry = {
+//    country: `Canada`,
+//    capital: `Ottowa`,
+//    language: `English`,
+//    population: 38,
+//    neighbors: [`US`, `Mexico`, `NP`],
+// };
 
-console.log(myCountry);
+// console.log(myCountry);
 
-// 8. Dot vs Bracket Notation
+// // 8. Dot vs Bracket Notation
 
-console.log(
-   `${myCountry.country} has ${myCountry.population} million ${myCountry.language} speaking people, ${myCountry.neighbors.length} neighbouring countries and a capital called ${myCountry.capital}.`
-);
+// console.log(
+//    `${myCountry.country} has ${myCountry.population} million ${myCountry.language} speaking people, ${myCountry.neighbors.length} neighbouring countries and a capital called ${myCountry.capital}.`
+// );
 
-// myCountry.population = Number.parseInt(myCountry.population) + 2;
-// myCountry.population = myCountry[`population`] - 2;
-myCountry.population += 2;
-console.log(myCountry.population);
+// // myCountry.population = Number.parseInt(myCountry.population) + 2;
+// // myCountry.population = myCountry[`population`] - 2;
+// myCountry.population += 2;
+// console.log(myCountry.population);
 
-// myCountry[`population`] = 36;
-myCountry[`population`] -= 2;
-console.log(myCountry.population);
+// // myCountry[`population`] = 36;
+// myCountry[`population`] -= 2;
+// console.log(myCountry.population);
+
+// 8. Object Methods
+
+// const myCountry = {
+//    country: `Canada`,
+//    capital: `Ottowa`,
+//    language: `English`,
+//    population: 38,
+//    neighbours: [`US`, `Mexico`, `NP`],
+
+//    describe: function () {
+//       return `${this.country} has ${this.population} million ${this.language} speaking people, ${this.neighbours.length} neighbouring countries and a capital called ${this.capital}.`;
+//    },
+
+//    checkIsland: function () {
+//       // this.neighbours.length === 0
+//       //    ? (this.isIsland = true)
+//       //    : (this.isIsland = false);
+
+//       this.isIsland = this.neighbours.length === 0 ? true : false;
+
+//       // this.island = !Boolean(this.neighbours.length); // why does this work?
+//       //// converts the value in the parenthesis to boolean then flips it !(..)
+
+//       if (this.isIsland === true) {
+//          console.log(`is an island`);
+//       } else {
+//          console.log(`is not an island`);
+//       }
+//    },
+// };
+
+// console.log(myCountry.describe());
+// myCountry.checkIsland();
+// console.log(myCountry);
+
+// 9. Iteration: The for Loop
+
+// for (let voter = 1; voter <= 50; voter++) {
+//    console.log(`Voter number ${voter} is currently voting...`);
+// }
+
+// 10. Looping Arrays, Breaking and Continuing
+
+// const populations = [38, 330, 6, 1402];
+
+// const percentages = [];
+
+// function percentageOfWorld(population) {
+//    return (population / 7900) * 100;
+// }
+
+// // // Original way
+// // const percentages = [
+// //    percentageOfWorld(populations[0]),
+// //    percentageOfWorld(populations[1]),
+// //    percentageOfWorld(populations[2]),
+// //    percentageOfWorld(populations[populations.length - 1]),
+// // ];
+
+// //Better way using for loop
+// for (let i = 0; i < populations.length; i++) {
+//    percentages.push(percentageOfWorld(populations[i]));
+// }
+
+// console.log(percentages);
+
+// 11. Looping Backwards and Loops in Loops
+
+// const listOfNeighbours = [
+//    [`Canada`, `Mexico`, `Spain`],
+//    [`Norway`, `Sweden`, `Russia`],
+// ];
+
+// // console.log(listOfNeighbours.length);
+// // console.log(listOfNeighbours[0].length);
+
+// console.log(`--- List of Neighbours ---`);
+// for (let i = 0; i < listOfNeighbours.length; i++) {
+//    for (let j = 0; j < listOfNeighbours[i].length; j++) {
+//       console.log(`Neighbour #${(i + 1) * (j + 1)}: ${listOfNeighbours[i][j]}`);
+//    }
+// }

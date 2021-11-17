@@ -39,7 +39,6 @@
 ////////////////////////////////////////////////////////////////
 
 // // Function declaration
-
 // function calcAge1(birthYear) {
 //    return 2037 - birthYear;
 // }
@@ -274,7 +273,298 @@
 
 ////////////////////////////////////////////////////////////////
 
-// storing related values in an array
+// // storing related values in an array
+// const farazArray = [
+//    `Faraz`,
+//    `Chand`,
+//    2037 - 1993,
+//    `teacher`,
+//    [`Michael`, `Peter`, `Steven`],
+// ];
+// console.log(farazArray);
+
+// //storing related values in an object using value pairs, object literal syntax
+// const faraz = {
+//    firstName: `Faraz`,
+//    lastName: `Chand`,
+//    age: 2037 - 1993,
+//    job: `teacher`,
+//    friends: [`Michael`, `Peter`, `Steven`],
+// };
+// console.log(faraz);
+
+// //Retrieving Data from objects - using dot notation
+
+// console.log(faraz.lastName);
+// console.log(faraz.firstName);
+
+// //Retrieving Data from objects - using using bracket notation
+
+// console.log(faraz[`lastName`]);
+// console.log(faraz[`firstName`]);
+
+// // Bracket notation can use any expression that results in a property, don't have to explicity write the string
+// const nameKey = `Name`;
+// console.log(faraz[`first` + nameKey]);
+// console.log(faraz[`last` + nameKey]);
+
+// // cannot use expressions in dot notation
+// // console.log(faraz.`last` + nameKey); // wont work
+
+// const interestedIn = prompt(
+//    `What do you want to know about Faraz? Choose between firstName, lastName, age, job, and friends`
+// );
+// console.log(interestedIn);
+// console.log(faraz.interestedIn); // will produce undefined, value does not exist
+
+// if (faraz[interestedIn]) {
+//    console.log(faraz[interestedIn]);
+// } else {
+//    console.log(
+//       `Wrong request! Choose between firstName, lastName, age, job, and friends`
+//    );
+// }
+
+// // adding properties to an object
+// faraz.location = `Canada`;
+// faraz[`twitter`] = `@farazChand`;
+// console.log(faraz.location);
+// console.log(faraz.twitter);
+
+// //Challenge
+// //"Faraz has 3 friends, and his best friend is Michael"
+
+// console.log(
+//    `${faraz.firstName} has ${
+//       faraz[`friends`].length
+//    } friends, and his best friend is called '${faraz.friends[0]}'`
+// );
+
+////////////////////////////////////////////////////////////////
+
+// const faraz = {
+//    firstName: `Faraz`,
+//    lastName: `Chand`,
+//    gender: `male`,
+//    birthYear: 1993,
+//    job: `teacher`,
+//    friends: [`Michael`, `Peter`, `Steven`],
+//    hasDriversLicense: false,
+
+//    // calcAge: function (birthYear) {
+//    //    return 2037 - birthYear;
+//    // },
+
+//    // calcAge: function () {
+//    //    // console.log(this);
+//    //    return 2037 - this.birthYear;
+//    // },
+
+//    calcAge: function () {
+//       // console.log(this);
+//       this.age = 2037 - this.birthYear;
+//       return this.age;
+//    },
+
+//    //Challenge: the jonas way
+//    getSummary: function () {
+//       return `${this.firstName} is a ${this.calcAge()}-year old ${
+//          this.job
+//       }, and he has ${this.hasDriversLicense ? `a` : `no`} driver's license.`;
+//    },
+
+//    // //extra
+//    // calcGender: function () {
+//    //    if (this.gender === `male`) {
+//    //       this.pronouns = {
+//    //          they: `he`,
+//    //          their: `his`,
+//    //          them: `him`,
+//    //       };
+//    //    } else if (this.gender === `female`) {
+//    //       this.pronouns = {
+//    //          they: `she`,
+//    //          their: `her`,
+//    //          them: `her`,
+//    //       };
+//    //    } else {
+//    //       this.pronouns = {
+//    //          they: `they`,
+//    //          their: `their`,
+//    //          them: `them`,
+//    //       };
+//    //    }
+//    // },
+//    // //extra
+//    // calcPossession: function () {
+//    //    if (
+//    //       (this.gender === `male` || this.gender === `female`) &&
+//    //       this.hasDriversLicense
+//    //    ) {
+//    //       this.hasOrNot = `has`;
+//    //    } else if (
+//    //       (this.gender === `male` || this.gender === `female`) &&
+//    //       !this.hasDriversLicense
+//    //    ) {
+//    //       this.hasOrNot = `does not have`;
+//    //    } else if (
+//    //       !(this.gender === `male` || this.gender === `female`) &&
+//    //       this.hasDriversLicense
+//    //    ) {
+//    //       this.hasOrNot = `have`;
+//    //    } else {
+//    //       this.hasOrNot = `do not have`;
+//    //    }
+//    // },
+//    // //extra
+//    // getCalcs: function () {
+//    //    this.calcAge();
+//    //    this.calcGender();
+//    //    this.calcPossession();
+//    // },
+
+//    // //Challenge: my way, the long and probably wrong way (extra)
+//    // getSummary: function () {
+//    //    if (this.hasDriversLicense) {
+//    //       this.summary = `${this.firstName} is a ${this.age}-year old ${this.job}, and ${this.pronouns.they} ${this.hasOrNot} ${this.pronouns.their} driver's license with ${this.pronouns.them}.`;
+//    //    } else {
+//    //       this.summary = `${this.firstName} is a ${this.age}-year old ${this.job}, and ${this.pronouns.they} ${this.hasOrNot} ${this.pronouns.their} driver's license with ${this.pronouns.them}.`;
+//    //    }
+
+//    //    return this.summary;
+//    // },
+// };
+
+// // console.log(faraz.calcAge(1993));
+// // console.log(faraz[`calcAge`](1993));
+
+// //// Final calcAge
+// // console.log(faraz.calcAge());
+// // console.log(faraz.age);
+// // console.log(faraz.age);
+// // console.log(faraz.age);
+
+// //Challenge
+// //"Faraz is a 44-year old teacher, and he has a driver's license"
+// // faraz.getCalcs(); // extra
+// console.log(faraz.getSummary());
+// console.log(faraz.getSummary());
+// console.log(faraz.getSummary());
+
+////////////////////////////////////////////////////////////////
+
+// const john = {
+//    fullName: `John Smith`,
+//    mass: 92,
+//    height: 1.95,
+
+//    calcBMI: function () {
+//       this.BMI = this.mass / this.height ** 2;
+//       return this.BMI;
+//    },
+// };
+
+// const mark = {
+//    fullName: `Mark Miller`,
+//    mass: 78,
+//    height: 1.69,
+
+//    calcBMI: function () {
+//       this.BMI = this.mass / this.height ** 2;
+//       return this.BMI;
+//    },
+// };
+
+// console.log(
+//    `${john.fullName}'s BMI (${john.calcBMI()})' is ${
+//       john.calcBMI() > mark.calcBMI() ? `higher` : `lower`
+//    } than ${mark.fullName}'s BMI (${mark.BMI})'`
+// );
+
+////////////////////////////////////////////////////////////////
+
+// //bad practice, not DRY
+// console.log(`Lifting weights repetition 1 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 2 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 3 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 4 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 5 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 6 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 7 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 8 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 9 🏋️‍♂️`);
+// console.log(`Lifting weights repetition 10 🏋️‍♂️`);
+
+// //for loop keeps running while condition is TRUE
+// for (let rep = 1; rep <= 10; rep++) {
+//    console.log(`Lifting weights repetition ${rep} 🏋️‍♂️`);
+// }
+
+////////////////////////////////////////////////////////////////
+
+// // Lets console log each index of this array separately
+// const farazArray = [
+//    `Faraz`,
+//    `Chand`,
+//    2037 - 1993,
+//    `teacher`,
+//    [`Michael`, `Peter`, `Steven`],
+// ];
+
+// // just for practice
+// const types = [];
+
+// ////the wrong way
+// // console.log(farazArray[0]);
+// // console.log(farazArray[1]);
+// // console.log(farazArray[2]);
+// // console.log(farazArray[3]);
+// // console.log(farazArray[4]);
+// // farazArray[5] does not exist, i
+
+// // using a for loop to iterate through the arrays index
+// //conditional could also be: i < 5; or i <= 4;
+// //if length or array changes, this would become a bug that would need to be updated
+// for (let i = 0; i < farazArray.length; i++) {
+//    //reading from first array
+//    console.log(farazArray[i], typeof farazArray[i]);
+
+//    // // storing the type of the first array in the new types array at the corresponding index
+//    // types[i] = typeof farazArray[i];
+
+//    // using the push method to do the same thing as above
+//    types.push(typeof farazArray);
+// }
+
+// console.log(types);
+
+// const years = [1991, 2007, 1969, 2020];
+
+// const ages = [];
+
+// for (let i = 0; i < years.length; i++) {
+//    // ages[i] = 2037 - years[i];
+//    ages.push(2037 - years[i]);
+//    console.log(`Age #${i + 1}: ${ages[i]} years old.`);
+// }
+// console.log(ages);
+
+// //continue and break
+
+// console.log(`--- ONLY STRINGS ---`);
+// for (let i = 0; i < farazArray.length; i++) {
+//    if (typeof farazArray[i] !== `string`) continue; // skips to next iteration if true
+//    console.log(farazArray[i], typeof farazArray[i]);
+// }
+
+// console.log(`--- BREAK WITH NUMBER ---`);
+// for (let i = 0; i < farazArray.length; i++) {
+//    if (typeof farazArray[i] === `number`) break; // exits entire for loop if true
+//    console.log(farazArray[i], typeof farazArray[i]);
+// }
+
+////////////////////////////////////////////////////////////////
+
 const farazArray = [
    `Faraz`,
    `Chand`,
@@ -282,61 +572,18 @@ const farazArray = [
    `teacher`,
    [`Michael`, `Peter`, `Steven`],
 ];
-console.log(farazArray);
 
-//storing related values in an object using value pairs, object literal syntax
-const faraz = {
-   firstName: `Faraz`,
-   lastName: `Chand`,
-   age: 2037 - 1993,
-   job: `teacher`,
-   friends: [`Michael`, `Peter`, `Steven`],
-};
-console.log(faraz);
+// 0, 1, ..., 4 looping forwards
+// 4, 3, ..., 0 looping backwards
 
-//Retrieving Data from objects - using dot notation
-
-console.log(faraz.lastName);
-console.log(faraz.firstName);
-
-//Retrieving Data from objects - using using bracket notation
-
-console.log(faraz[`lastName`]);
-console.log(faraz[`firstName`]);
-
-// Bracket notation can use any expression that results in a property, don't have to explicity write the string
-const nameKey = `Name`;
-console.log(faraz[`first` + nameKey]);
-console.log(faraz[`last` + nameKey]);
-
-// cannot use expressions in dot notation
-// console.log(faraz.`last` + nameKey); // wont work
-
-const interestedIn = prompt(
-   `What do you want to know about Faraz? Choose between firstName, lastName, age, job, and friends`
-);
-console.log(interestedIn);
-console.log(faraz.interestedIn); // will produce undefined, value does not exist
-
-if (faraz[interestedIn]) {
-   console.log(faraz[interestedIn]);
-} else {
-   console.log(
-      `Wrong request! Choose between firstName, lastName, age, job, and friends`
-   );
+for (let i = farazArray.length - 1; i >= 0; i--) {
+   console.log(i, farazArray[i]);
 }
 
-// adding properties to an object
-faraz.location = `Canada`;
-faraz[`twitter`] = `@farazChand`;
-console.log(faraz.location);
-console.log(faraz.twitter);
-
-//Challenge
-//"Faraz has 3 friends, and his best friend is Michael"
-
-console.log(
-   `${faraz.firstName} has ${
-      faraz[`friends`].length
-   } friends, and his best friend is called '${faraz.friends[0]}'`
-);
+for (let exercise = 1; exercise <= 3; exercise++) {
+   console.log(`--- Starting Exercise #${exercise} ---`);
+   for (let rep = 1; rep <= 5; rep++) {
+      console.log(`Exercise #${exercise}: Rep #${rep} done!`);
+   }
+   console.log(`Exercise #${exercise} finished!!!`);
+}
