@@ -565,25 +565,98 @@
 
 ////////////////////////////////////////////////////////////////
 
-const farazArray = [
-   `Faraz`,
-   `Chand`,
-   2037 - 1993,
-   `teacher`,
-   [`Michael`, `Peter`, `Steven`],
-];
+// const farazArray = [
+//    `Faraz`,
+//    `Chand`,
+//    2037 - 1993,
+//    `teacher`,
+//    [`Michael`, `Peter`, `Steven`],
+// ];
 
-// 0, 1, ..., 4 looping forwards
-// 4, 3, ..., 0 looping backwards
+// // 0, 1, ..., 4 looping forwards
+// // 4, 3, ..., 0 looping backwards
 
-for (let i = farazArray.length - 1; i >= 0; i--) {
-   console.log(i, farazArray[i]);
-}
+// for (let i = farazArray.length - 1; i >= 0; i--) {
+//    console.log(i, farazArray[i]);
+// }
 
-for (let exercise = 1; exercise <= 3; exercise++) {
-   console.log(`--- Starting Exercise #${exercise} ---`);
-   for (let rep = 1; rep <= 5; rep++) {
-      console.log(`Exercise #${exercise}: Rep #${rep} done!`);
+// for (let exercise = 1; exercise <= 3; exercise++) {
+//    console.log(`--- Starting Exercise #${exercise} ---`);
+//    for (let rep = 1; rep <= 5; rep++) {
+//       console.log(`Exercise #${exercise}: Rep #${rep} done!`);
+//    }
+//    console.log(`Exercise #${exercise} finished!!!`);
+// }
+
+////////////////////////////////////////////////////////////////
+
+// for (let rep = 1; rep <= 10; rep++) {
+//    console.log(`Lifting weights repetition ${rep} 🏋️‍♂️`);
+// }
+
+// let rep = 1;
+// while (rep <= 10) {
+//    // console.log(`WHILE-LOOP:Lifting weights repetition ${rep} 🏋️‍♂️`);
+//    rep++;
+// }
+
+// //create a dice variable
+// let dice = Math.trunc(Math.random() * 6) + 1;
+// // console.log(dice);
+// if (dice === 6) {
+//    console.log(`You rolled a 6! GAME OVER before it even started..`);
+// }
+
+// while (dice !== 6) {
+//    console.log(`You rolled a ${dice}!`);
+//    dice = Math.trunc(Math.random() * 6) + 1;
+
+//    if (dice === 6) {
+//       console.log(`You rolled a 6! GAME OVER!`);
+//    }
+// }
+
+////////////////////////////////////////////////////////////////
+
+// Coding Challenge #4
+
+const bills = [22, 295, 176, 440, 37, 105, 10, 1100, 86, 52];
+const tips = [];
+const totals = [];
+
+const calcTip = (bill) =>
+   bill >= 50 && bill <= 300 ? bill * 0.15 : bill * 0.2;
+
+const calcTotal = (bill, total) => bill + total;
+
+const calcAverage = function (arr) {
+   let sum = 0;
+   for (let i = 0; i < arr.length; i++) {
+      // sum = sum + arr[i];
+      sum += arr[i];
    }
-   console.log(`Exercise #${exercise} finished!!!`);
+   return sum / arr.length;
+};
+
+for (let i = 0; i < bills.length; i++) {
+   tips.push(calcTip(bills[i]));
+   totals.push(calcTotal(bills[i], tips[i]));
 }
+console.log(bills, tips, totals);
+console.log(calcAverage(totals));
+console.log(calcAverage(tips));
+console.log(calcAverage(bills));
+
+console.log(Math.trunc(10.079 * 100) / 100);
+console.log(10 ** 0);
+
+const roundNumber = function (value, decimalPlace) {
+   let x = Number(Math.round(value + "e" + decimalPlace) + `e-` + decimalPlace);
+   console.log(value, x);
+};
+
+roundNumber(5.555, 2);
+console.log(Math.round(17.5 * 1) / 1); //works
+console.log(Math.round(10.75 * 10) / 10); // works
+console.log(Math.round(10.075 * 100) / 100); // doesn't round correctly as you increase decimal places..
+console.log(Number(Math.round(10.075 + `e2`) + `e-2`)); // works once change to exponential notation

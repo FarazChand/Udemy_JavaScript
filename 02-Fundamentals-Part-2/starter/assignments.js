@@ -216,31 +216,66 @@
 // 11. Looping Backwards and Loops in Loops
 
 // const listOfNeighbours = [
-//    [`Canada`, `Mexico`, `Spain`],
+//    [`Canada`, `Mexico`],
+//    [`Spain`],
 //    [`Norway`, `Sweden`, `Russia`],
 // ];
 
-// // console.log(listOfNeighbours.length);
-// // console.log(listOfNeighbours[0].length);
+// let x = 1;
 
-// console.log(`--- List of Neighbours ---`);
 // for (let i = 0; i < listOfNeighbours.length; i++) {
 //    for (let j = 0; j < listOfNeighbours[i].length; j++) {
-//       console.log(`Neighbour #${(i + 1) * (j + 1)}: ${listOfNeighbours[i][j]}`);
+//       console.log(`Neighbor #${x}: ${listOfNeighbours[i][j]}`);
+//       x++;
 //    }
 // }
 
-const listOfNeighbours = [
-   [`Canada`, `Mexico`],
-   [`Spain`],
-   [`Norway`, `Sweden`, `Russia`],
-];
+// 12. The while Loop
 
-let x = 1;
+// const populations = [38, 330, 6, 1402];
+// const percentages = [];
 
-for (let i = 0; i < listOfNeighbours.length; i++) {
-   for (let j = 0; j < listOfNeighbours[i].length; j++) {
-      console.log(`Neighbor #${x}: ${listOfNeighbours[i][j]}`);
-      x++;
-   }
-}
+// function percentageOfWorld(population) {
+//    return (population / 7900) * 100;
+// }
+
+// let i = 0;
+// while (i < populations.length) {
+//    percentages[i] = percentageOfWorld(populations[i]);
+//    i++;
+// }
+// console.log(populations, percentages);
+
+const people = {
+   populations: [38, 330, 6, 1402],
+   countryName: [`Canada`, `USA`, `Finland`, `China`],
+
+   percentageOfWorld: function (population) {
+      return (population / 7900) * 100;
+   },
+   calcPercentage: function () {
+      this.percentages = [];
+
+      let i = 0;
+      while (i < this.populations.length) {
+         this.percentages[i] = this.percentageOfWorld(this.populations[i]);
+         i++;
+      }
+   },
+   calcSummary: function () {
+      if (this.populations)
+         for (let i = 0; i < this.populations.length; i++) {
+            console.log(
+               `The population of ${this.countryName[i]} is ${
+                  this.populations[i]
+               }, which is ${
+                  Math.round(this.percentages[i] * 100) / 100
+               }% of the worlds population.`
+            );
+         }
+   },
+};
+
+people.calcPercentage();
+console.log(people.populations, people.percentages);
+people.calcSummary();
