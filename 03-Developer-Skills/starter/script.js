@@ -71,24 +71,63 @@
 
 ////////////////////////////////////////////////////////////
 
-const measureKelvin = function () {
-  const measurement = {
-    type: `temp`,
-    unit: `celsius`,
-    // C) FIX
-    value: Number(prompt(`Degrees celsius:`)),
-  };
+// const measureKelvin = function () {
+//   const measurement = {
+//     type: `temp`,
+//     unit: `celsius`,
+//     // C) FIX
+//     value: Number(prompt(`Degrees celsius:`)),
+//   };
 
-  // B) FIND
-  console.log(measurement);
-  console.table(measurement);
+//   // B) FIND
+//   console.log(measurement);
+//   console.table(measurement);
 
-  // console.log(measurement.value);
-  // console.warn(measurement.value);
-  // console.error(measurement.value);
+//   // console.log(measurement.value);
+//   // console.warn(measurement.value);
+//   // console.error(measurement.value);
 
-  const kelvin = measurement.value + 273;
-  return kelvin;
+//   const kelvin = measurement.value + 273;
+//   return kelvin;
+// };
+// // A) IDENTIFY
+// console.log(measureKelvin());
+
+////////////////////////////////////////////////////////////
+
+// Example: [17,21,23] will print "... 17 C in 1 days ... 21 C in 2 days ... 23 C in 3 days ..."
+// TEST DATA 1: [17, 21, 23]
+// TEST DATA 2: [12, 5, -5, 0, 4]
+
+// 1) Understanding the problem
+// - how do we map the array to display like the example?
+// - how do we make sure the function can use an array of any length?
+// - how do we make it look like the example text "... 17 C in 1 days ..." etc
+
+// 2) Breaking up into sub-problems
+// - make a new variable to hold the desired string
+// - create a function called 'printForecast'
+//    - takes in an array and logs a string like the example to the console
+// - define the codeblock of the function:
+//    - need to loop through the array starting at the first index, (i=0)
+//    - need to loop through each index (i++)
+//    - need to stop looping at the end of the array (i<arr.length)
+//
+//    - use the index of the current loop as well as the value and add to the string
+//      at the end of the loop
+//
+
+const testData1 = [17, 21, 23];
+const testData2 = [12, 5, -5, 0, 4];
+
+const printForecast = function (arr) {
+  let newString = ``;
+
+  for (let i = 0; i < arr.length; i++) {
+    newString += `... ${arr[i]} C in ${i + 1} days `;
+  }
+  return newString + `...`;
 };
-// A) IDENTIFY
-console.log(measureKelvin());
+
+console.log(printForecast(testData1));
+console.log(printForecast(testData2));
