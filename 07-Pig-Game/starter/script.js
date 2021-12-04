@@ -98,3 +98,5 @@ btnHold.addEventListener('click', function () {
 });
 
 btnNew.addEventListener('click', init);
+
+// Dec 3, only did theory
