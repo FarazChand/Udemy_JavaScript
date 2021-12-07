@@ -37,51 +37,154 @@
 // // console.log(age);  // reference error
 // // printAge(); // reference error
 
-//Hoisting with variables
-console.log(me); // undefined, does not throw error - sneaky bug
-// console.log(job); // Throws error
-// console.log(year); // Throws error
+// //Hoisting with variables
+// console.log(me); // undefined, does not throw error - sneaky bug
+// // console.log(job); // Throws error
+// // console.log(year); // Throws error
 
-var me = `Jonas`;
-let job = `teacher`;
-const year = 1991;
+// var me = `Jonas`;
+// let job = `teacher`;
+// const year = 1991;
 
-// Hoisting with Functions
-console.log(addDecl(2, 3)); //function declarations are hoisted correctly
-// console.log(addExpr(2, 3));  // Expression Throws error
-// console.log(addArrow(2, 3)); // Expression Throws error
-// console.log(addArrow(2, 3)); // Error: Undefined is not a function
+// // Hoisting with Functions
+// console.log(addDecl(2, 3)); //function declarations are hoisted correctly
+// // console.log(addExpr(2, 3));  // Expression Throws error
+// // console.log(addArrow(2, 3)); // Expression Throws error
+// // console.log(addArrow(2, 3)); // Error: Undefined is not a function
 
-function addDecl(a, b) {
-  return a + b;
-}
+// function addDecl(a, b) {
+//   return a + b;
+// }
 
-const addExpr = function (a, b) {
-  return a + b;
+// const addExpr = function (a, b) {
+//   return a + b;
+// };
+
+// const addArrow = (a, b) => a + b;
+
+// var addArrow2 = (a, b) => a + b;
+
+// // Example
+
+// if (!numProducts) deleteShoppingCart(); // Undefined, sneaky bug
+
+// !numProducts ? deleteShoppingCart() : console.log(numProducts); // Undefined, sneaky bug
+
+// var numProducts = 10;
+
+// !numProducts ? deleteShoppingCart() : console.log(numProducts); // var finally defined as intended
+
+// function deleteShoppingCart() {
+//   console.log(`All products deleted!`);
+// }
+
+// var x = 1; // creates property on the global window object
+// let y = 2; // does not create property on the global window object
+// const z = 3; // does not create property on the global window object
+
+// console.log(x === window.x); // true
+// console.log(y === window.y); // false
+// console.log(z === window.z); // false
+
+// console.log(this);
+
+// const calcAge = function (birthYear) {
+//   console.log(2037 - birthYear);
+//   console.log(this);
+// };
+
+// calcAge(1991);
+
+// const calcAgeArrow = birthYear => {
+//   console.log(2037 - birthYear);
+//   console.log(this);
+// };
+
+// calcAgeArrow(1980);
+
+// const jonas = {
+//   year: 1991,
+//   calcAge: function () {
+//     console.log(this);
+//     console.log(2037 - this.year);
+//   },
+// };
+
+// jonas.calcAge();
+
+// const matilda = {
+//   year: 2017,
+// };
+
+// matilda.calcAge = jonas.calcAge;
+// matilda.calcAge();
+
+// const f = jonas.calcAge;
+
+// f();
+
+// var firstName = `Matilda`;
+
+// const jonas = {
+//   firstName: `Jonas`,
+//   year: 1991,
+//   calcAge: function () {
+//     // console.log(this);
+//     console.log(2037 - this.year);
+
+//     // Solution 1:
+//     // const self = this;
+//     // const isMillenial = function () {
+//     //   console.log(self);
+//     //   console.log(self.year >= 1981 && self.year <= 1996); //self = this
+//     // };
+
+//     // Solution 2(es6):
+//     const isMillenial = () => {
+//       console.log(this);
+//       console.log(this.year >= 1981 && this.year <= 1996); //self = this
+//     };
+
+//     isMillenial();
+//   },
+
+//   greet: () => {
+//     console.log(this);
+//     console.log(`Hey ${this.firstName}`);
+//   },
+// };
+// jonas.greet(); // "this" lexical scope is the global scope, bug
+// jonas.calcAge();
+
+// // Arguments Keyword
+// const addExpr = function (a, b) {
+//   console.log(arguments);
+//   return a + b;
+// };
+// addExpr(2, 5);
+// addExpr(2, 5, 8, 12);
+
+// var addArrow = (a, b) => {
+//   console.log(arguments);
+//   return a + b;
+// };
+
+// addArrow(2, 5, 8); // throws error, argument keyword doesnt exist in =>
+
+let age = 30;
+let oldAge = age;
+
+age = 31;
+console.log(age);
+console.log(oldAge);
+
+const me = {
+  name: `Jonas`,
+  age: 30,
 };
 
-const addArrow = (a, b) => a + b;
+const friend = me;
+friend.age = 27;
 
-var addArrow2 = (a, b) => a + b;
-
-// Example
-
-if (!numProducts) deleteShoppingCart(); // Undefined, sneaky bug
-
-!numProducts ? deleteShoppingCart() : console.log(numProducts); // Undefined, sneaky bug
-
-var numProducts = 10;
-
-!numProducts ? deleteShoppingCart() : console.log(numProducts); // var finally defined as intended
-
-function deleteShoppingCart() {
-  console.log(`All products deleted!`);
-}
-
-var x = 1; // creates property on the global window object
-let y = 2; // does not create property on the global window object
-const z = 3; // does not create property on the global window object
-
-console.log(x === window.x); // true
-console.log(y === window.y); // false
-console.log(z === window.z); // false
+console.log('Friend:', friend);
+console.log('Me', me);
