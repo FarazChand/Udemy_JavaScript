@@ -48,6 +48,11 @@ const restaurant = {
       `Here is your delicious pasta with ${ing1}, ${ing2} and ${ing3}`
     );
   },
+
+  orderPizza: function (mainIngredient, ...otherIngredients) {
+    console.log(mainIngredient);
+    console.log(otherIngredients);
+  },
 };
 
 //////////////////////////////////////////
@@ -290,3 +295,55 @@ const restaurant = {
 // console.log(expressionMatter(1, 2, 3));
 // console.log(expressionMatter(1, 3, 1));
 // console.log(expressionMatter(2, 2, 2));
+
+//////////////////////////////////////////
+
+// REST OPERATOR
+
+// //-- 1) Destructuring --
+
+// // SPREAD because on RIGHT side of =
+// const arr = [1, 2, ...[3, 4]];
+
+// // REST, because on LEFT side of =
+// const [a, b, ...others] = [1, 2, 3, 4, 5];
+// console.log(a, b, others);
+
+// const [pizza, , risotto, ...otherFood] = [
+//   ...restaurant.mainMenu,
+//   ...restaurant.starterMenu,
+// ];
+// console.log(pizza, risotto, otherFood);
+// // REST must be last, can only be one
+
+// // REST with objects
+// let { sat, ...weekdays } = restaurant.openingHours;
+// console.log(sat, weekdays);
+
+// // proof of shallow copy
+// sat.open = 'loloolol';
+// console.log(sat.open);
+// console.log(restaurant.openingHours.sat.open);
+
+// // -- 2)  Functions --
+// const add = function (...numbers) {
+//   let sum = 0;
+//   for (let i = 0; i < numbers.length; i++) {
+//     sum += numbers[i];
+//   }
+//   console.log(sum);
+// };
+
+// add(2, 3);
+// add(5, 3, 7, 2);
+// add(8, 2, 5, 3, 2, 1, 4);
+
+// // using a spread operator as an argument to be compressed by a rest parameter
+// const x = [23, 5, 6];
+// add(...x);
+
+// //
+// restaurant.orderPizza('mushrooms', 'onion', 'olives', 'spinach');
+// restaurant.orderPizza('mushrooms');
+
+// Short Circuiting (&& and ||)
