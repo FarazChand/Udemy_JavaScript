@@ -536,3 +536,40 @@ const restaurant = {
 // console.log([...menu.entries()]);
 
 //////////////////////////////////////////
+
+//Optional Chaining
+
+//Without
+if (restaurant.openingHours && restaurant.openingHours.mon) {
+  console.log(restaurant.openingHours.mon.open);
+}
+
+if (restaurant.openingHours && restaurant.openingHours.fri) {
+  console.log(restaurant.openingHours.fri.open);
+}
+
+//With Optional Chaining
+console.log(restaurant.openingHours.mon?.open); //checks if mon exists then accesses
+// returns undefined if property does not exist
+
+// checks both properties, both exist, returns value
+console.log(restaurant.openingHours?.fri?.open);
+
+//Example
+const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+for (const [i, day] of days.entries()) {
+  const open =
+    restaurant.openingHours[day]?.open ?? `... actually we are closed`;
+  console.log(`On ${day} we open at ${open}`);
+}
+
+//Methods
+console.log(restaurant.order?.(0, 1) ?? `Method does not exist`);
+console.log(restaurant.orderALL?.(0, 1) ?? `Method does not exist`);
+
+//Arrays
+const users = [{ name: `Jonas`, email: `hello@jonas.io` }];
+
+console.log(users[0]?.name ?? `User does not exist`);
+console.log(users[1]?.name ?? `User does not exist`);
