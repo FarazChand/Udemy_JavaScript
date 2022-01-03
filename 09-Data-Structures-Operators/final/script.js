@@ -87,6 +87,7 @@ Some_Variable
   calculate_AGE
 delayed_departure
 
+
 SHOULD PRODUCE THIS OUTPUT (5 separate console.log outputs)
 underscoreCase      ✅
 firstName           ✅✅

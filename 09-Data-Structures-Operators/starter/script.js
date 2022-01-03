@@ -1009,62 +1009,287 @@ const game = {
 
 //////////////////////////////////////////
 
-// Working with Strings
+// // Working with Strings Part 1:
 
-const airline = 'TAP Air Portugal';
-const plane = 'A320';
+// const airline = 'TAP Air Portugal';
+// const plane = 'A320';
 
-// can specify strings index:
-console.log(plane[0]); // A
-console.log(plane[1]); // 3
-console.log(plane[2]); // 2
-console.log('B737'[0]); // logs 'B'
+// // can specify strings index:
+// console.log(plane[0]); // A
+// console.log(plane[1]); // 3
+// console.log(plane[2]); // 2
+// console.log('B737'[0]); // logs 'B'
 
-// can also read length property:
-console.log(airline.length);
-console.log('B737'.length);
+// // can also read length property:
+// console.log(airline.length);
+// console.log('B737'.length);
 
-// strings also have methods, like arrays
-console.log(airline.indexOf('r')); // 6
-console.log(airline.lastIndexOf('r')); // 10
-console.log(airline.indexOf('Portugal')); // 8, case sensitive
-console.log(airline.indexOf('portugal')); //-1, not found
+// // strings also have methods, like arrays
+// console.log(airline.indexOf('r')); // 6
+// console.log(airline.lastIndexOf('r')); // 10
+// console.log(airline.indexOf('Portugal')); // 8, case sensitive
+// console.log(airline.indexOf('portugal')); //-1, not found
 
-// Can extract part of a string using the 'slice' method:
-// - slice method needs indexes as arguments
-// - since strings are primitive, they cannot be mutated
-// - this means that the original string is not changed
-// - instead this method creates a sub string
-// - this substring must be stored in a variable/DS if
-//   you want to use it
-console.log(airline.slice(4)); // Air Portugal -> sub string
-console.log(airline.slice(4, 7)); // Air, end value not included
+// // Can extract part of a string using the 'slice' method:
+// // - slice method needs indexes as arguments
+// // - since strings are primitive, they cannot be mutated
+// // - this means that the original string is not changed
+// // - instead this method creates a sub string
+// // - this substring must be stored in a variable/DS if
+// //   you want to use it
+// console.log(airline.slice(4)); // Air Portugal -> sub string
+// console.log(airline.slice(4, 7)); // Air, end value not included
 
-// Lets extract the first word, then the last word. Lets pretend
-// we don't know any information about the string:
-console.log(airline.slice(0, airline.indexOf(' ')));
-console.log(airline.slice(airline.lastIndexOf(' ') + 1));
+// // Lets extract the first word, then the last word. Lets pretend
+// // we don't know any information about the string:
+// console.log(airline.slice(0, airline.indexOf(' ')));
+// console.log(airline.slice(airline.lastIndexOf(' ') + 1));
 
-// can give a negative index, starts counting from the end
-console.log(airline.slice(-2));
-console.log(airline.slice(1, -1));
+// // can give a negative index, starts counting from the end
+// console.log(airline.slice(-2));
+// console.log(airline.slice(1, -1));
 
-const checkMiddleSeat = function (seat) {
-  // B and E are middle seats
-  const s = seat.slice(-1);
-  s === 'B' || s === 'E'
-    ? console.log(`Middle seat.`)
-    : console.log('Not a middle seat');
-};
+// const checkMiddleSeat = function (seat) {
+//   // B and E are middle seats
+//   const s = seat.slice(-1);
+//   s === 'B' || s === 'E'
+//     ? console.log(`Middle seat.`)
+//     : console.log('Not a middle seat');
+// };
 
-checkMiddleSeat('11B');
-checkMiddleSeat('23C');
-checkMiddleSeat('3E');
+// checkMiddleSeat('11B');
+// checkMiddleSeat('23C');
+// checkMiddleSeat('3E');
 
-console.log(new String('Jonas')); // string object
-console.log(typeof new String('Jonas'));
-console.log(typeof new String('Jonas').slice(1)); // string object
+// console.log(new String('Jonas')); // string object
+// console.log(typeof new String('Jonas'));
+// console.log(typeof new String('Jonas').slice(1)); // returns string primitive
 
-// strings are primitive, so why can we call methods on them?
-// when we call a method on a string, its converted into a string object, which allows us to use methods on them
-// all string methods return primitive strings back
+// // - strings are primitive, so why can we call methods on them?
+// // - when we call a method on a string, its converted into a string object, which allows us
+// //   to use methods on them(happens in the background)
+// // - all string methods return primitive strings back
+
+// // ***
+
+// // ---Working with Strings Part 2:---
+
+// // --Simple String Methods--
+
+// // Changing the Case of a String:
+// console.log(airline.toLowerCase());
+// console.log(airline.toUpperCase());
+// console.log('jonas'.toUpperCase());
+
+// // Fix capitalization in name
+// const passenger = 'jOnAS'; //should be 'Jonas'
+// const passengerLower = passenger.toLowerCase();
+// const passengerCorrect =
+//   passengerLower[0].toUpperCase() + passengerLower.slice(1);
+// console.log(passengerCorrect);
+
+// // Same thing but within a function
+// const caseCorrect = function (name) {
+//   const nameLower = name.toLowerCase();
+//   return name[0].toUpperCase() + nameLower.slice(1);
+// };
+// console.log(caseCorrect('jOnAS'));
+
+// // ---
+
+// // Comparing emails
+// const email = 'hello@jonas.io';
+// const loginEmail = '   Hello@Jonas.Io \n'; // entered kind of wrong
+// console.log(email, loginEmail);
+
+// // convert and compare in order to see if the login is valid
+// const lowerEmail = loginEmail.toLowerCase();
+// const trimmedEmail = lowerEmail.trim(); // removes all white space
+// console.log(trimmedEmail);
+
+// // the intermediate step is not needed, can do it all at once
+// // - this is because a string method will return the updated string
+// const normalizedEmail = loginEmail.toLowerCase().trim();
+// console.log(email, normalizedEmail);
+// console.log(email === normalizedEmail);
+
+// // Same thing but within a function
+// const normalizingEmail = function (correctEmail, enteredEmail) {
+//   const fixedEmail = enteredEmail.toLowerCase().trim();
+//   return correctEmail === fixedEmail;
+// };
+// console.log(normalizingEmail(email, loginEmail));
+
+// // ---
+
+// // replacing parts of a string with the 'replace' method
+// const priceGB = '288,97£';
+// const priceUS = priceGB.replace('£', '$').replace(',', '.');
+// console.log(priceUS);
+
+// // 'replace' method only replaces the first occurrence of the specified string
+// const announcement =
+//   'All passengers come to boarding door 23. Boarding door 23!';
+// console.log(announcement.replace('door', 'gate')); // only replaces first 'door'
+
+// // can instead use 'replaceAll' method or regular expression:
+// console.log(announcement.replaceAll('door', 'gate')); //replace all
+// console.log(announcement.replace(/door/g, 'gate')); // reg exp
+
+// // ---
+
+// // Boolean String Methods
+// const plane2 = 'A320neo';
+// const plane3 = 'Airbus A320neo';
+// console.log(plane2.includes('A320')); // returns true
+// console.log(plane2.includes('Boeing')); // returns false
+// console.log(plane2.startsWith('Air')); // returns false
+// console.log(plane3.startsWith('Air')); // returns true
+
+// // Eg: check if plane3 is part of the new(neo) 'Airbus' family
+// if (plane3.startsWith('Airbus') && plane3.endsWith('neo')) {
+//   console.log(`Part of the NEW Airbus family`);
+// }
+
+// // Practice exercise: Check if passengers baggage is allowed on the plane
+// const checkBaggage = function (items) {
+//   const baggage = items.toLowerCase();
+//   if (baggage.includes('knife') || baggage.includes('gun')) {
+//     console.log(`You are not allowed on board.`);
+//   } else {
+//     console.log(`Welcome aboard!`);
+//   }
+// };
+// // need to convert it to lowercase because these boolean methods are case sensitive
+// checkBaggage('I have a laptop, some Food and a pocket Knife');
+// checkBaggage(`Socks and camera`);
+// checkBaggage(`Got some snacks and a gun for protection`);
+
+// // ***
+
+// // Working with Strings Part 3:
+
+// // Split a string into multiple parts using the 'split' method
+// // - based on a divider string
+// // - splits the string based on the divider and stores them as elements in a new array
+// console.log('a+very+nice+string'.split('+')); // ['a', 'very', 'nice', 'string']
+// console.log('Jonas Schmedtmann'.split(' ')); // ['Jonas', 'Schmedtmann']
+
+// // Can use this to create an array that will be deconstructed into variables:
+// const [firstName, lastName] = 'Jonas Schmedtmann'.split(' ');
+
+// // join method
+// const newName = ['Mr.', firstName, lastName.toUpperCase()].join(' ');
+// console.log(newName);
+
+// // function for capitalizing multiple names at once, using split and join:
+// const capitalizeName = function (name) {
+//   const names = name.split(' ');
+//   const namesUpper = [];
+
+//   for (let n of names) {
+//     n = n.toLowerCase();
+//     // namesUpper.push(n[0].toUpperCase() + n.slice(1));
+//     namesUpper.push(n.replace(n[0], n[0].toUpperCase()));
+//   }
+//   console.log(namesUpper.join(' '));
+// };
+
+// capitalizeName('jessica ann smith davis');
+// capitalizeName('jonas schmedtmann');
+// capitalizeName('fArAZ cHaNd');
+
+// // Padding a string using the 'padStart' and 'padEnd' methods:
+// // - 2 arguments, first one is how long the string will be after padding
+// // - second argument is what character you want to use to pad
+// const message = 'Go to gate 23!';
+// console.log(message.padStart(25, '+'));
+// console.log('jonas'.padStart(25, '+')); // will both end at the same length
+// console.log(message.padStart(25, '+').padEnd(35, '+'));
+
+// // RWEX: Credit card, last four digits + masking:
+// const maskCreditCard = function (number) {
+//   const str = number + '';
+//   const last = str.slice(-4);
+//   return last.padStart(str.length, '*');
+// };
+
+// console.log(maskCreditCard(13224754));
+// console.log(maskCreditCard(4337846386467477));
+// console.log(maskCreditCard('1241252632412312512412'));
+
+// // Repeat Method:
+// // - allows use to repeat the same string multiple times.
+// const message2 = 'Bad weather... All Departures Delayed';
+// console.log(message2.repeat(5));
+
+// const planesInLine = function (n) {
+//   console.log(`there are ${n} planes in line ${` ✈ `.repeat(n)}`);
+// };
+
+// planesInLine(5);
+// planesInLine(3);
+// planesInLine(12);
+
+//////////////////////////////////////////
+
+// Coding Challenge #4
+
+// Write a program that receives a list of variable names written in underscore_case and convert them to camelCase.
+
+// The input will come from a textarea inserted into the DOM (see code below), and conversion will happen when the button is pressed.
+
+// THIS TEST DATA (pasted to textarea)
+// underscore_case
+//  first_name
+// Some_Variable
+//   calculate_AGE
+// delayed_departure
+
+// SHOULD PRODUCE THIS OUTPUT (5 separate console.log outputs)
+// underscoreCase      ✅
+// firstName           ✅✅
+// someVariable        ✅✅✅
+// calculateAge        ✅✅✅✅
+// delayedDeparture    ✅✅✅✅✅
+
+document.body.append(document.createElement('textarea'));
+document.body.append(document.createElement('button'));
+
+// // MY WAY!
+document.querySelector('button').addEventListener('click', function () {
+  const text = document.querySelector('textarea').value;
+  const tempArr = text.split('\n');
+  const finalArr = [];
+
+  for (const [position, tempVar] of tempArr.entries()) {
+    const normalizedVar = tempVar.toLowerCase().trim();
+    const normalizedArr = normalizedVar.split('_');
+    const finalWordArr = [];
+
+    for (const [index, word] of normalizedArr.entries()) {
+      const newWord =
+        index !== 0 ? word[0].toUpperCase() + word.slice(1) : word;
+      finalWordArr.push(newWord);
+    }
+    finalArr.push(finalWordArr.join('').padEnd(20) + '✅'.repeat(position + 1));
+  }
+  const finalString = finalArr.join('\n');
+  console.log(finalString);
+});
+
+// Jonas' way
+
+// document.querySelector('button').addEventListener('click', function () {
+//   const text = document.querySelector('textarea').value;
+//   const rows = text.split('\n');
+
+//   for (const [i, row] of rows.entries()) {
+//     const [first, second] = row.toLowerCase().trim().split('_');
+//     const output = `${first}${second.replace(
+//       second[0],
+//       second[0].toUpperCase()
+//     )}`;
+//     console.log(`${output.padEnd(20)}${'✅'.repeat(i + 1)}`);
+//   }
+// });
