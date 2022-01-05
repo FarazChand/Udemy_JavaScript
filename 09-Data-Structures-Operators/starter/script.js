@@ -1278,6 +1278,8 @@ document.querySelector('button').addEventListener('click', function () {
   console.log(finalString);
 });
 
+console.log('Live server is working');
+
 // Jonas' way
 
 // document.querySelector('button').addEventListener('click', function () {
