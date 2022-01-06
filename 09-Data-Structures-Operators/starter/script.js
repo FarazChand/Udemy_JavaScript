@@ -1,9 +1,5 @@
 'use strict';
 
-// Data needed for a later exercise
-const flights =
-  '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
-
 const weekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 const openingHours = {
@@ -1233,52 +1229,50 @@ const game = {
 
 //////////////////////////////////////////
 
-// Coding Challenge #4
+// // Coding Challenge #4
 
-// Write a program that receives a list of variable names written in underscore_case and convert them to camelCase.
+// // Write a program that receives a list of variable names written in underscore_case and convert them to camelCase.
 
-// The input will come from a textarea inserted into the DOM (see code below), and conversion will happen when the button is pressed.
+// // The input will come from a textarea inserted into the DOM (see code below), and conversion will happen when the button is pressed.
 
-// THIS TEST DATA (pasted to textarea)
-// underscore_case
-//  first_name
-// Some_Variable
-//   calculate_AGE
-// delayed_departure
+// // THIS TEST DATA (pasted to textarea)
+// // underscore_case
+// //  first_name
+// // Some_Variable
+// //   calculate_AGE
+// // delayed_departure
 
-// SHOULD PRODUCE THIS OUTPUT (5 separate console.log outputs)
-// underscoreCase      ✅
-// firstName           ✅✅
-// someVariable        ✅✅✅
-// calculateAge        ✅✅✅✅
-// delayedDeparture    ✅✅✅✅✅
+// // SHOULD PRODUCE THIS OUTPUT (5 separate console.log outputs)
+// // underscoreCase      ✅
+// // firstName           ✅✅
+// // someVariable        ✅✅✅
+// // calculateAge        ✅✅✅✅
+// // delayedDeparture    ✅✅✅✅✅
 
-document.body.append(document.createElement('textarea'));
-document.body.append(document.createElement('button'));
+// document.body.append(document.createElement('textarea'));
+// document.body.append(document.createElement('button'));
 
-// // MY WAY!
-document.querySelector('button').addEventListener('click', function () {
-  const text = document.querySelector('textarea').value;
-  const tempArr = text.split('\n');
-  const finalArr = [];
+// // // MY WAY!
+// document.querySelector('button').addEventListener('click', function () {
+//   const text = document.querySelector('textarea').value;
+//   const tempArr = text.split('\n');
+//   const finalArr = [];
 
-  for (const [position, tempVar] of tempArr.entries()) {
-    const normalizedVar = tempVar.toLowerCase().trim();
-    const normalizedArr = normalizedVar.split('_');
-    const finalWordArr = [];
+//   for (const [position, tempVar] of tempArr.entries()) {
+//     const normalizedVar = tempVar.toLowerCase().trim();
+//     const normalizedArr = normalizedVar.split('_');
+//     const finalWordArr = [];
 
-    for (const [index, word] of normalizedArr.entries()) {
-      const newWord =
-        index !== 0 ? word[0].toUpperCase() + word.slice(1) : word;
-      finalWordArr.push(newWord);
-    }
-    finalArr.push(finalWordArr.join('').padEnd(20) + '✅'.repeat(position + 1));
-  }
-  const finalString = finalArr.join('\n');
-  console.log(finalString);
-});
-
-console.log('Live server is working');
+//     for (const [index, word] of normalizedArr.entries()) {
+//       const newWord =
+//         index !== 0 ? word[0].toUpperCase() + word.slice(1) : word;
+//       finalWordArr.push(newWord);
+//     }
+//     finalArr.push(finalWordArr.join('').padEnd(20) + '✅'.repeat(position + 1));
+//   }
+//   const finalString = finalArr.join('\n');
+//   console.log(finalString);
+// });
 
 // Jonas' way
 
@@ -1295,3 +1289,66 @@ console.log('Live server is working');
 //     console.log(`${output.padEnd(20)}${'✅'.repeat(i + 1)}`);
 //   }
 // });
+
+//////////////////////////////////////////
+
+//String Methods Practice
+// - turn this the following data into a readable format
+// - should look like this:
+//  🔴 Delayed Departure from FAO to TXL (11h25)
+//               Arrival from BRU to FAO (11h25)
+//   🔴 Delayed Arrival from HEL to FAO (11h25)
+//            Departure from FAO to LIS (11h25)
+
+// Data needed for a later exercise
+const flights =
+  '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
+
+// My Way:
+const flightsArr = flights.split('+');
+// console.log(flightsArr);
+
+for (const flight of flightsArr) {
+  const newFlightStr = flight.replaceAll('_', ' ').replaceAll(';', ' ').trim();
+  // console.log(newFlightStr);
+  const flightSectionArr = newFlightStr.split(' ');
+  // console.log(flightSectionArr);
+
+  const newFlightSectionArr = [];
+  let delayed = 0;
+
+  if (flightSectionArr[0] === 'Delayed') {
+    newFlightSectionArr.push('🔴 ' + flightSectionArr[0]);
+    delayed = 1;
+  }
+
+  delayed === 1
+    ? newFlightSectionArr.push(flightSectionArr[1])
+    : newFlightSectionArr.push(flightSectionArr[0]);
+
+  delayed === 1
+    ? newFlightSectionArr.push(flightSectionArr[2].slice(0, 3).toUpperCase())
+    : newFlightSectionArr.push(flightSectionArr[1].slice(0, 3).toUpperCase());
+
+  delayed === 1
+    ? newFlightSectionArr.push(flightSectionArr[3].slice(0, 3).toUpperCase())
+    : newFlightSectionArr.push(flightSectionArr[2].slice(0, 3).toUpperCase());
+
+  delayed === 1
+    ? newFlightSectionArr.push(flightSectionArr[4].replace(':', 'h'))
+    : newFlightSectionArr.push(flightSectionArr[3].replace(':', 'h'));
+
+  if (delayed === 1) {
+    newFlightSectionArr[1] =
+      newFlightSectionArr[0] + ' ' + newFlightSectionArr[1];
+    newFlightSectionArr.shift();
+  }
+  // console.log(newFlightSectionArr);
+  console.log(
+    `${newFlightSectionArr[0]} from ${newFlightSectionArr[1]} to ${newFlightSectionArr[2]} (${newFlightSectionArr[3]})`.padStart(
+      44
+    )
+  );
+}
+
+// console.log(newFlightSectionArr);
