@@ -1304,51 +1304,37 @@ const game = {
 const flights =
   '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
 
-// My Way:
-const flightsArr = flights.split('+');
-// console.log(flightsArr);
+// // My Way: (OK, but not efficient. This can be good if the original string is seperated by more than one type of symbol. In this case, we replaced the ';' and the '_' symbols with spaces when we only needed to split each sentence up using the ';' symbol, this added a lot of complexity where it wasn't needed.)
+// const flightsArr = flights.split('+');
 
-for (const flight of flightsArr) {
-  const newFlightStr = flight.replaceAll('_', ' ').replaceAll(';', ' ').trim();
-  // console.log(newFlightStr);
-  const flightSectionArr = newFlightStr.split(' ');
-  // console.log(flightSectionArr);
+// for (const flight of flightsArr) {
+//   const newFlightStr = flight.replaceAll('_', ' ').replaceAll(';', ' ').trim();
+//   const flightSectionArr = newFlightStr.split(' ');
 
-  const newFlightSectionArr = [];
-  let delayed = 0;
+//   if (flightSectionArr[0] === 'Delayed') {
+//     flightSectionArr[1] =
+//       '🔴 ' + flightSectionArr[0] + ' ' + flightSectionArr[1];
+//     flightSectionArr.shift();
+//   }
+//   const [type = '0', from = '0', to = '0', time = '0'] = flightSectionArr;
+//   console.log(
+//     `${type} from ${from.slice(0, 3).toUpperCase()} to ${to
+//       .slice(0, 3)
+//       .toUpperCase()} (${time.replace(':', 'h')})`.padStart(43)
+//   );
+// }
 
-  if (flightSectionArr[0] === 'Delayed') {
-    newFlightSectionArr.push('🔴 ' + flightSectionArr[0]);
-    delayed = 1;
-  }
+// Jonas' way: (much better for this situation)
 
-  delayed === 1
-    ? newFlightSectionArr.push(flightSectionArr[1])
-    : newFlightSectionArr.push(flightSectionArr[0]);
+const getCode = str => str.slice(0, 3).toUpperCase();
 
-  delayed === 1
-    ? newFlightSectionArr.push(flightSectionArr[2].slice(0, 3).toUpperCase())
-    : newFlightSectionArr.push(flightSectionArr[1].slice(0, 3).toUpperCase());
-
-  delayed === 1
-    ? newFlightSectionArr.push(flightSectionArr[3].slice(0, 3).toUpperCase())
-    : newFlightSectionArr.push(flightSectionArr[2].slice(0, 3).toUpperCase());
-
-  delayed === 1
-    ? newFlightSectionArr.push(flightSectionArr[4].replace(':', 'h'))
-    : newFlightSectionArr.push(flightSectionArr[3].replace(':', 'h'));
-
-  if (delayed === 1) {
-    newFlightSectionArr[1] =
-      newFlightSectionArr[0] + ' ' + newFlightSectionArr[1];
-    newFlightSectionArr.shift();
-  }
-  // console.log(newFlightSectionArr);
-  console.log(
-    `${newFlightSectionArr[0]} from ${newFlightSectionArr[1]} to ${newFlightSectionArr[2]} (${newFlightSectionArr[3]})`.padStart(
-      44
-    )
-  );
+for (const flight of flights.split('+')) {
+  const [type, from, to, time] = flight.split(';');
+  const output = `${type.startsWith('_Delayed') ? '🔴' : ''} ${type
+    .replaceAll('_', ' ')
+    .trim()} from ${getCode(from)} to ${getCode(to)} (${time.replace(
+    ':',
+    'h'
+  )})`.padStart(43);
+  console.log(output);
 }
-
-// console.log(newFlightSectionArr);
