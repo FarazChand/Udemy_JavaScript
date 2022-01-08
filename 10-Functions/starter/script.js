@@ -206,139 +206,220 @@
 
 ///////////////////////////////////////////
 
-// The Call and Apply Methods
+// // The Call and Apply Methods
 
-// lufthansa airline
-const lufthansa = {
-  airline: 'Lufthansa',
-  iataCode: 'LH',
-  bookings: [],
-  book(flightNum, name) {
-    console.log(
-      `${name} booked a seat on ${this.airline} flight ${this.iataCode}${flightNum}`
-    );
-    this.bookings.push({ flight: `${this.iataCode}${flightNum}`, name });
-  },
-};
+// // lufthansa airline
+// const lufthansa = {
+//   airline: 'Lufthansa',
+//   iataCode: 'LH',
+//   bookings: [],
+//   book(flightNum, name) {
+//     console.log(
+//       `${name} booked a seat on ${this.airline} flight ${this.iataCode}${flightNum}`
+//     );
+//     this.bookings.push({ flight: `${this.iataCode}${flightNum}`, name });
+//   },
+// };
 
-// 'this' from the 'book' method points to the 'lufthansa' object because that's what called it.
-lufthansa.book(239, 'Jonas Schmedtmann');
-lufthansa.book(639, 'John Smith');
-console.log(lufthansa);
+// // 'this' from the 'book' method points to the 'lufthansa' object because that's what called it.
+// lufthansa.book(239, 'Jonas Schmedtmann');
+// lufthansa.book(639, 'John Smith');
+// console.log(lufthansa);
 
-// Lets say lufthansa created a new airline years later..
-// - we want to use the same method from lufthansa, but copying and pasting
-//   it in this object is a bad practise
-// - instead we take the method and store it in an external function, now we
-//   can reuse this function for all the different airlines.. BUT the 'this'
-//   keyword wont work :(
-const eurowings = {
-  airline: 'Eurowings',
-  iataCode: 'EW',
-  bookings: [],
-};
+// // Lets say lufthansa created a new airline years later..
+// // - we want to use the same method from lufthansa, but copying and pasting
+// //   it in this object is a bad practise
+// // - instead we take the method and store it in an external function, now we
+// //   can reuse this function for all the different airlines.. BUT the 'this'
+// //   keyword wont work :(
+// const eurowings = {
+//   airline: 'Eurowings',
+//   iataCode: 'EW',
+//   bookings: [],
+// };
 
-// Storing the lufthansa's book method into an external variable
-const book = lufthansa.book;
+// // Storing the lufthansa's book method into an external variable
+// const book = lufthansa.book;
 
-// Just a regular function call not a method, this keyword points to undefined
-// - how do we fix this?
-// book(23, 'Sarah Williams'); // bug, does not work
+// // Just a regular function call not a method, this keyword points to undefined
+// // - how do we fix this?
+// // book(23, 'Sarah Williams'); // bug, does not work
 
-// We have to explicitly tell the 'this' keyword where we want it to point
-// - three funcion methods that do this: call, apply and bind
+// // We have to explicitly tell the 'this' keyword where we want it to point
+// // - three funcion methods that do this: call, apply and bind
 
-// Call Method:
-// - first argument is where we want the this keyword of the function we are
-//   calling to point
-// - the rest of the arguments are what ever other arguments the function takes
-// - note that we are not calling the 'book' function directly, we are actually
-//   calling the 'call' method which calls the 'book' function
-book.call(eurowings, 23, 'Sarah Williams');
-console.log(eurowings);
+// // Call Method:
+// // - first argument is where we want the this keyword of the function we are
+// //   calling to point
+// // - the rest of the arguments are what ever other arguments the function takes
+// // - note that we are not calling the 'book' function directly, we are actually
+// //   calling the 'call' method which calls the 'book' function
+// book.call(eurowings, 23, 'Sarah Williams');
+// console.log(eurowings);
 
-book.call(lufthansa, 239, 'Mary Cooper');
-console.log(lufthansa);
+// book.call(lufthansa, 239, 'Mary Cooper');
+// console.log(lufthansa);
 
-const swiss = {
-  airline: 'Swiss Air Lines',
-  iataCode: 'LX',
-  bookings: [],
-};
+// const swiss = {
+//   airline: 'Swiss Air Lines',
+//   iataCode: 'LX',
+//   bookings: [],
+// };
 
-book.call(swiss, 583, 'Mary Cooper');
-console.log(swiss);
+// book.call(swiss, 583, 'Mary Cooper');
+// console.log(swiss);
 
-// Apply method
-// - does the same thing as the 'call' method, but does not receive a list of
-//   arguments after the this keyword argument
-// - instead it takes an array of the arguments
-const flightData = [583, 'George Cooper'];
-book.apply(swiss, flightData);
-console.log(swiss);
+// // Apply method
+// // - does the same thing as the 'call' method, but does not receive a list of
+// //   arguments after the this keyword argument
+// // - instead it takes an array of the arguments
+// const flightData = [583, 'George Cooper'];
+// book.apply(swiss, flightData);
+// console.log(swiss);
 
-// - 'apply' method is not used as often anymore, there is a better way
-book.call(swiss, ...flightData);
-console.log(swiss);
+// // - 'apply' method is not used as often anymore, there is a better way
+// book.call(swiss, ...flightData);
+// console.log(swiss);
 
-// So we just learned a very powerful set of tools when working with objects and object methods:
-//  - we can store a method into an external variable (now its a normal func)
-// - this allows us to reuse the method for other objects
-// - we can manipulate where the 'this' keyword of that function points
-// - we do this using the 'call' method on the new external function
-// - note that the objects should have the same property names, or it might
-//   interfear with how the code is implemented
+// // So we just learned a very powerful set of tools when working with objects and object methods:
+// //  - we can store a method into an external variable (now its a normal func)
+// // - this allows us to reuse the method for other objects
+// // - we can manipulate where the 'this' keyword of that function points
+// // - we do this using the 'call' method on the new external function
+// // - note that the objects should have the same property names, or it might
+// //   interfear with how the code is implemented
+
+// ///////////////////////////////////////////
+
+// // The Bind Method
+// // - just like the call method, allows us to set the 'this' keyword of any
+// //   function call
+// // - the difference is that 'bind' does not immediately call the function
+// // - instead it returns a new function where the 'this' keyword is bound
+
+// // book.call(eurowings, 23, 'Sarah Williams');
+
+// const bookEW = book.bind(eurowings);
+// // - this will return a new function
+// // - the 'this' keyword will always point to the 'eurowings' obeject for
+// //   this function
+// // - this means we no longer need to specify the 'this' keyword for this func
+// bookEW(23, 'Steven Williams');
+
+// // We can now do this for all the airlines
+// const bookLH = book.bind(lufthansa);
+// const bookLX = book.bind(swiss);
+// // - if we had to use book many flights, this saves us from having to use the
+// //   'call' method repeatedly
+
+// // We can also bind the other arguments we want to pass, these arguments will be set in stone once passed:
+// const bookEW23 = book.bind(eurowings, 23);
+
+// // Only need to pass name because the flight number has already been binded
+// bookEW23('Jonas Schmedtmann');
+// bookEW23('Martha Cooper');
+// // - specifying parts of the argument beforehand is actualy a common pattern called 'partial application', which means parts of the argument of the original function are already applied/set
+
+// // There are other situations where using the bind method is very useful, for example, when we use objects together with event listners
+
+// // With event listners
+// lufthansa.planes = 300;
+// lufthansa.buyPlane = function () {
+//   console.log(this);
+
+//   this.planes++;
+//   console.log(this.planes);
+// };
+
+// // document.querySelector('.buy').addEventListener('click', lufthansa.buyPlane);
+// // -> when clicked, this logs NAN
+// // -> This is because in an event handler function, the 'this' keyword always points to the element on which the handler is attatched to
+// // -> We still want the 'this' keyword to point to the lufthansa object itself, so what do we do to fix this?
+// // -> We can manually define the 'this' keyword by either using the 'call' or 'bind' methods
+// // -> in this case, we know that we need to pass a function, not call one, so we will use the 'bind' method to save the function into a variable that we can later pass to the event listner - or in this case, the bind method will return a function directly to the event listner
+
+// // Instead we do this:
+// document
+//   .querySelector('.buy')
+//   .addEventListener('click', lufthansa.buyPlane.bind(lufthansa));
+
+// // Partial application
+// // -> in a lot of situations, we are not even interested in the 'this' keyword, we are just interested in setting a value of an argument. We still use the 'bind' method for this
+// // -> partial application means that we can preset parameters:
+// const addTax = (rate, value) => value + value * rate;
+// console.log(addTax(0.1, 200));
+// // -> in this example, we created a simple function that calculates a value after applying taxes
+
+// // Presetting rate for Portugal (VAT)
+// const addVAT = addTax.bind(null, 0.23);
+// // -> we create a new function with the 'bind' method and store it in a variable
+// // -> we dont need to set the 'this' keyword, so the first argument is 'null'
+// // -> we only care about setting the second argument wich is the tax rate
+// // addVAT - value => value + value * 0.23; // same as above
+
+// console.log(addVAT(100));
+// console.log(addVAT(23));
+// // -> you might think that we could have just used default parameters for this, but the difference is that we didn't change the initial function, rather we created a new function using its implementation and added a default value using the bind method. Technically, we could create a lot more functions for different tax rates by using this technique without having to constantly rewrite the original functions implementation
+// // Keep in mind that the order of arguments is important
+
+// // Challenge: Create a function that returns a function that does what the addVAT function does
+
+// const createTaxer = function (tax) {
+//   return function (value) {
+//     return value + value * tax;
+//   };
+// };
+
+// const addVAT2 = createTaxer(0.23);
+// console.log(addVAT2(100));
 
 ///////////////////////////////////////////
 
-// The Bind Method
-// - just like the call method, allows us to set the 'this' keyword of any
-//   function call
-// - the difference is that 'bind' does not immediately call the function
-// - instead it returns a new function where the 'this' keyword is bound
+/*
 
-// book.call(eurowings, 23, 'Sarah Williams');
+// Challenge 1:
 
-const bookEW = book.bind(eurowings);
-// - this will return a new function
-// - the 'this' keyword will always point to the 'eurowings' obeject for
-//   this function
-// - this means we no longer need to specify the 'this' keyword for this func
-bookEW(23, 'Steven Williams');
+const poll = {
+  question: 'What is your favorite programming language?',
+  options: ['0: JavaScript', '1: Python', '2: Rust', '3: C++'],
+  answers: new Array(4).fill(0),
 
-// We can now do this for all the airlines
-const bookLH = book.bind(lufthansa);
-const bookLX = book.bind(swiss);
-// - if we had to use book many flights, this saves us from having to use the
-//   'call' method repeatedly
+  registerNewAnswer() {
+    const answer = Number(
+      prompt(
+        `${this.question}\n${this.options.join('\n')}\n(Write option number)`
+      )
+    );
 
-// We can also bind the other arguments we want to pass, these arguments will be set in stone once passed:
-const bookEW23 = book.bind(eurowings, 23);
+    if (!isNaN(answer) && answer >= 0 && answer < this.answers.length) {
+      this.answers[answer]++;
+    } else {
+      console.log('Please enter an answer from 0 - 3');
+    }
+    this.displayRestults();
+    this.displayRestults('string');
+  },
 
-// Only need to pass name because the flight number has already been binded
-bookEW23('Jonas Schmedtmann');
-bookEW23('Martha Cooper');
-// - specifying parts of the argument beforehand is actualy a common pattern called 'partial application', which means parts of the argument of the original function are already applied/set
-
-// There are other situations where using the bind method is very useful, for example, when we use objects together with event listners
-
-// With event listners
-lufthansa.planes = 300;
-lufthansa.buyPlane = function () {
-  console.log(this);
-
-  this.planes++;
-  console.log(this.planes);
+  displayRestults(type = 'array') {
+    if (type === 'string') {
+      console.log(`Poll results are ${this.answers.join(', ')}`);
+    } else if (type === 'array') {
+      console.log(this.answers);
+    }
+  },
 };
 
-// document.querySelector('.buy').addEventListener('click', lufthansa.buyPlane);
-// -> when clicked, this logs NAN
-// -> This is because in an event handler function, the 'this' keyword always points to the element on which the handler is attatched to
-// -> We still want the 'this' keyword to point to the lufthansa object itself, so what do we do to fix this?
-// -> We can manually define the 'this' keyword by either using the 'call' or 'bind' methods
-// -> in this case, we know that we need to pass a function, not call one, so we will use the 'bind' method to save the function into a variable that we can later pass to the event listner - or in this case, the bind method will return a function directly to the event listner
-
-// Instead we do this:
 document
-  .querySelector('.buy')
-  .addEventListener('click', lufthansa.buyPlane.bind(lufthansa));
+  .querySelector('.poll')
+  .addEventListener('click', poll.registerNewAnswer.bind(poll));
+
+// BONUS TEST DATA 1: [5, 2, 3]
+// BONUS TEST DATA 2: [1, 5, 3, 9, 6, 1]
+poll.displayRestults.call({ answers: [5, 2, 3] });
+poll.displayRestults.call({ answers: [5, 2, 3] }, 'string');
+poll.displayRestults.call({ answers: [1, 5, 3, 9, 6, 1] });
+poll.displayRestults.call({ answers: [1, 5, 3, 9, 6, 1] }, 'string');
+
+*/
+
+///////////////////////////////////////////
