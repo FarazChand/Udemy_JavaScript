@@ -423,3 +423,176 @@ poll.displayRestults.call({ answers: [1, 5, 3, 9, 6, 1] }, 'string');
 */
 
 ///////////////////////////////////////////
+
+/*
+
+// Immediately Invoked Function Expressions (IIFE)
+// -> sometimes in JS we need a function that is only executed once, and then never again
+// -> basically a function that dissapears after its called once
+
+// We could create a function and only execute it once..
+const runOnce = function () {
+  console.log('This will never run again');
+};
+runOnce();
+runOnce(); // can keep running
+// -> however, this is not what we want to do
+// -> in this case, we can just run the same function as many times as we want, we want the function to stop existing after we call it the first time.
+// -> pretty much, this means executing the function without having to save it anywhere
+
+// IIFE
+(function () {
+  console.log('This will actually never run again');
+})();
+// -> by wrapping the function in parenthesis, we tell the engine that this block of code is an expression (including function keyword)
+// -> without the parenthesis this would not work, because the engine would think that it is a statement, which require a name - which require saving the function.
+// -> we add the function call parenthesis right after the function code block in order to call the function, like we normally do (call())
+// -> in other words, we wrap the function statement in parenthesis to make it a value, then call that value with a function call
+
+// Works with Arrow Functions
+(() => console.log('This will ALSO never run again'))();
+
+// Why was IIFE invented?
+// -> functions create scopes, its important that one scope does not have access to variables from an inner scope
+// -> we say that all data defined inside a scope is 'private'
+// -> that means this data is 'encapsulated'
+// -> data encapsulation and data privacy are extremely important concepts in programming
+// -> these concepts protect our variables from being over written by other parts of the program or even external scripts/libraries
+// -> e.g: global does not have access to function scope, but functions have access to global scope: scope chain
+
+// For now keep in mind:
+// -> it's important to hide variables
+// -> scopes are a good tool for doing this
+// -> this is also the reason why IIFE were invented
+// -> remember that 'let' and 'const' respect scope where as 'var' does not
+// -> in modern JS, IIFE are not used as often anymore, because if all we want to do is create a new scope for data privacy, we just have to create a new block:
+
+{
+  const isPrivate = 23;
+  var notPrivate = 46;
+}
+
+// console.log(isPrivate); // not defined in current scope
+console.log(notPrivate); // will work
+
+// If you really need to execute a function just once, IIFE are still the way to go. We do this for things like ASYNC AWAIT
+
+*/
+
+///////////////////////////////////////////
+/*
+
+// Closures
+// -> Not a feature we explicitly use, simply happens automatically in certain situations
+// -> a close makes a function 'remember' all the variables that existed in the functions birth place
+// -> any function always has access to the variable environment of the execution context in which it was created - even after that execution context is gone.
+// -> a Closure is basically this^ variable environment attatched to the function, exactly as it was at the time and place the function was created - the function never loses its connection with the variable environtment of its birth place
+// -> the scope chain is preserved through the closure
+// -> this include all function arguments
+
+const secureBooking = function () {
+  let passengerCount = 0;
+
+  return function () {
+    passengerCount++;
+    console.log(`${passengerCount} passengers`);
+  };
+};
+
+const booker = secureBooking();
+
+booker();
+booker();
+booker();
+
+// -> JS looks for the variable in the current scope
+// -> If it can't find it, it then immediately looks in the closure for the variable
+// -> if it still can't find it, it looks up the scope chain for the variable
+// -> note that the variables inside the closure retain any changes made to them by the function, they do not reset after the function is called
+
+//  ***
+
+// Some more definitions of Closures for clairity:
+
+// -> A closure is the closed over VE of the EC in which a function was created, even after the EC is gone - in other words, even after the function to which the execution context belongs - returns.
+// -> A close gives a function access to all the variables of its parent function, even after that parent function has returned. The function keeps a reference to its outer scope, which preserves the scope chain throughout time.
+// -> A closure makes sure that a function doesn't lose connection to the variables that existed at the functions birth place.
+// A closure is like a backpack that a function carries around wherever it goes. This backpack has all the variables that were present in the environment where the function was created.
+
+// Remember that we do not create closures manually, it's an automatic JS feature. We also cannot access closed-over variables explicitly. A closure is NOT a tangible JS object.
+
+console.dir(booker);
+// -> allows us to look at the properties of the function in the log, one of the properties is the scope which also contains the closure information. This allows us to observe the closure, but not access
+
+// ***
+
+// More Closure Examples
+
+// Example 1: Don't have to return a function for closures:
+let f = 0;
+
+const g = function () {
+  const a = 23;
+  f = function () {
+    console.log(a * 2);
+  };
+};
+
+// New function birth place = new closure, old closure lost
+const h = function () {
+  const b = 777;
+  f = function () {
+    console.log(b * 2);
+  };
+};
+
+g();
+f();
+console.dir(f); // has the value of a from the closure
+
+// Re-assaigning f function
+h();
+f();
+console.dir(f); // no longer has the value of a, replaced with b
+
+// Example 2: Timer
+const boardPassengers = function (n, wait) {
+  const perGroup = n / 3;
+
+  setTimeout(function () {
+    console.log(`We are now boarding all ${n} passengers`);
+    console.log(`There are 3 groups, each with ${perGroup} passengers`);
+  }, wait * 1000);
+
+  console.log(`Will start boarding in ${wait} seconds`);
+};
+
+const perGroup = 1000; // does not use this, closure > scopechain
+boardPassengers(180, 3);
+
+*/
+
+///////////////////////////////////////////
+
+// Challenge #2:
+
+(function () {
+  const header = document.querySelector('h1');
+  header.style.color = 'red';
+
+  document.querySelector('body').addEventListener('click', function () {
+    header.style.color = 'blue';
+  });
+})();
+
+// Why does this work?
+// -> We created an IIFE...
+// -> In that IIFE we declared a variable that held the value of the header in our HTML
+// -> we set the color to red, not really important, but when the page loads the h1 element will be red. This just proves that we selected the element and stored it in the variable
+// -> we then selected the body element and added an event listner to it that waits for the body to be clicked.
+// -> when it's clicked the event handler function will be called and the header will change to blue, however...
+// -> the IIFE is called and returned before we clicked the body and run the call back function... which means when we call the call back function, the variable we are using inside it (header) no longer exists, well technically, its execution context isn't on the call stack anymore, so it is out of the scope chain. It's no longer in the varaible environment. So 'header' should have no value attatched to it.
+
+// NOW, because of the automatic mechanism of closures in javascript, the call back function actually retains the original variable environment(scope chain) it had when it was created, since it was created within the original IIFE - and the 'header' variable was part of that variable environment, the call back function "remembers" the now non-existent variable, and is able to use its value to complete the task. This is essentially the power of closures.
+
+// Closures allow functions to have a permanent connection with the varialbe environment of which the function was created, even after the parent function returns and the execution context and variable environment of that function has dissapeared.

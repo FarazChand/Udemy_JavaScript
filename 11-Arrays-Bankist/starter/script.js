@@ -74,3 +74,69 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+/*
+
+// Simple Array Methods
+
+// Why do arrays have methods?
+// -> methods are functions attatched to objects
+// -> having array methods means arrays are objects
+// -> array methods are methods that can be called by all arrays in JS
+// -> we can see array methods as tools for arrays
+
+let arr = ['a', 'b', 'c', 'd', 'e'];
+
+// SLICE:
+// -> simillar to the string method by the same name
+// -> can extract part of any array without changing the original array
+// -> will return a new array with only the extracted parts
+// -> takes an argument of the starting index for extraction
+// -> second argument is optional, tells the method where to stop extracting, does not include the index of the argument, only up to the index of the argument.
+
+console.log(arr.slice(2)); // c,d,e
+console.log(arr.slice(2, 4)); // c,d
+console.log(arr.slice(-2)); // last two elements
+console.log(arr.slice(-1)); // last element
+console.log(arr.slice(1, -2)); // b,c
+console.log(arr.slice()); // will return shallow copy of array
+console.log([...arr]); // also makes shallow copy, preference based
+
+// SPLICE:
+// -> almost the same as 'slice' except that it does mutate the original array
+// -> first argument tells the method where to start (index)
+// -> second argument tells the method how many elements to delete, starting from the first arguments index
+
+// console.log(arr.splice(2)); // c,d,e
+console.log(arr.splice(-1)); // remove last element
+console.log(arr); // losese extracted part
+arr.splice(1, 2);
+console.log(arr); // loses extracted part
+
+// REVERSE:
+// -> reverses string
+// -> does mutate the original array
+
+arr = ['a', 'b', 'c', 'd', 'e'];
+const arr2 = ['j', 'i', 'h', 'g', 'f'];
+console.log(arr2.reverse());
+
+// CONCAT
+// -> joins two arrays
+// -> call the method on the first array, pass the second array
+// -> does not mutate the original array
+
+const letters = arr.concat(arr2);
+console.log(letters);
+console.log([...arr, ...arr2]); // same result, preference based
+
+// JOIN
+// -> joins all the elements of an array into a string
+// -> the argument is a string that is used to join these elements
+// -> does not mutate the original array
+
+console.log(letters.join(' - '));
+
+// Remember that we also know:
+// push, unshift, pop, shift, indexOf, includes
+
+*/
