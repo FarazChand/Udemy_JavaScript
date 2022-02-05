@@ -140,3 +140,23 @@ console.log(letters.join(' - '));
 // push, unshift, pop, shift, indexOf, includes
 
 */
+/////////////////////////////////////////////////
+
+// The New at Method
+// - accesses the specified index of the array it is called on
+// - argument specifies what index to access
+
+const arr = [23, 11, 64];
+
+// get first index (0th)
+console.log(arr[0]); // logs 0 index of array - old way
+console.log(arr.at(0)); // same result, more modern
+
+// get last index
+console.log(arr[arr.length - 1]); // old way
+console.log(arr.slice(-1)[0]); // newer way
+console.log(arr.at(-1)); // newest way, situational/preference based
+
+//also works on string
+console.log('jonas'.at(0)); // j
+console.log('jonas'.at(-1)); // s
