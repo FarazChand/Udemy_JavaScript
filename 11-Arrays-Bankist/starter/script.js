@@ -64,11 +64,13 @@ const inputClosePin = document.querySelector('.form__input--pin');
 // Creating DOM Elements
 // - always good to pass the data into a function instead of having the function work with a global variable
 
-const displayMovements = function (movements) {
+const displayMovements = function (movements, sort = false) {
   // reset the html
   containerMovements.innerHTML = '';
 
-  movements.forEach(function (mov, i) {
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
+  movs.forEach(function (mov, i) {
     // evaluate the movement and assign its label accordingly
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
@@ -77,7 +79,7 @@ const displayMovements = function (movements) {
       <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-      <div class="movements__value">${mov}</div>
+      <div class="movements__value">${mov}€</div>
   </div>`;
 
     // insert html
@@ -85,18 +87,36 @@ const displayMovements = function (movements) {
   });
 };
 
-displayMovements(account1.movements);
-
 // Calculating and displaying the total balance:
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance} EUR`;
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${acc.balance}€`;
 };
 
-calcDisplayBalance(account1.movements);
+//Calculating and Displaying the Summary, total IN and OUT, Intrest
+const calcDisplaySumarry = function (acc) {
+  const incomes = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${incomes}€`;
+
+  const outcomes = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = `${Math.abs(outcomes)}€`;
+
+  const interest = acc.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * acc.interestRate) / 100)
+    .filter((int, i, arr) => {
+      // console.log(arr);
+      return int >= 1;
+    })
+    .reduce((acc, int) => acc + int, 0);
+  labelSumInterest.textContent = `${interest}€`;
+};
 
 // Computing Usernames
-
 const createUsernames = function (accs) {
   accs.forEach(function (acc) {
     acc.username = acc.owner
@@ -106,10 +126,119 @@ const createUsernames = function (accs) {
       .join('');
   });
 };
-
 createUsernames(accounts);
-// console.log(accounts);
 
+//combining main functions for updating UI
+const updateUI = function (acc) {
+  // Display movements
+  displayMovements(acc.movements);
+  // Display balance
+  calcDisplayBalance(acc);
+  // Display summary
+  calcDisplaySumarry(acc);
+};
+
+// Event handler
+let currentAccount;
+
+btnLogin.addEventListener('click', function (e) {
+  // Prevent form from default behaviour of reloading and sumbitin
+  e.preventDefault();
+
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  // console.log(currentAccount);
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display UI and welcome message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+
+    // Clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    // Update UI
+    updateUI(currentAccount);
+  } else {
+    console.log(
+      `Sorry, something went wrong. Check your username and pin and try again.`
+    );
+  }
+});
+
+// Implementing Transfers
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+
+  inputTransferAmount.value = inputTransferTo.value = '';
+
+  if (
+    amount > 0 &&
+    receiverAcc &&
+    currentAccount.balance >= amount &&
+    receiverAcc.username !== currentAccount.username
+  ) {
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+
+    // Update UI
+    updateUI(currentAccount);
+  }
+});
+
+// loan
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    // Add Movement
+    currentAccount.movements.push(amount);
+
+    // Update UI
+    updateUI(currentAccount);
+  }
+  inputLoanAmount.value = '';
+});
+
+// close account
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  if (
+    currentAccount.username === inputCloseUsername.value &&
+    currentAccount.pin === Number(inputClosePin.value)
+  ) {
+    const index = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+
+    // Delete account
+    accounts.splice(index, 1);
+
+    // Hide UI
+    containerApp.style.opacity = 0;
+  }
+
+  inputCloseUsername.value = inputClosePin.value = '';
+});
+
+// Sort
+let sorted = false;
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted;
+});
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -442,6 +571,7 @@ console.log(withdrawals);
 
 */
 /////////////////////////////////////////////////
+/*
 
 // Reduce method:
 // - used to boil down all the elements in an array to one single value, for example adding up all the numbers in an array
@@ -474,3 +604,551 @@ const max = movements.reduce((acc, mov) => {
 }, movements[0]);
 
 console.log(max);
+
+*/
+/////////////////////////////////////////////////
+/*
+
+// Coding Challenge #2:
+// - see details in video
+
+const testData1 = [5, 2, 4, 1, 15, 3];
+const testData2 = [16, 6, 10, 5, 6, 1, 4];
+
+const calcAverageHumanAge = function (dogAges) {
+  // Step 1:
+  const humanAges = dogAges.map(function (dogAge) {
+    if (dogAge <= 2) {
+      return dogAge * 2;
+    } else {
+      return 16 + dogAge * 4;
+    }
+  });
+  console.log(humanAges);
+
+  // Step 2:
+  const adultDogsOnly = humanAges.filter(function (humanAge) {
+    return humanAge >= 18;
+  });
+  console.log(adultDogsOnly);
+
+  // Step 3:
+  const sumOfAges = adultDogsOnly.reduce(function (acc, age) {
+    return acc + age;
+  }, 0);
+  console.log(sumOfAges);
+
+  return sumOfAges / adultDogsOnly.length;
+};
+
+console.log(calcAverageHumanAge(testData1));
+console.log(`---------------`);
+console.log(calcAverageHumanAge(testData2));
+console.log(`---------------`);
+
+//Cleaner way with chaining
+const calcAverageHumanAge2 = function (dogAges) {
+  const averageHumanAge = dogAges
+    .map(dogAge => (dogAge <= 2 ? 2 * dogAge : 16 + dogAge * 4))
+    .filter(adultDogs => adultDogs >= 18)
+    .reduce((acc, age, i, arr) => acc + age / arr.length, 0);
+
+  return averageHumanAge;
+};
+
+const avgDogAge1 = calcAverageHumanAge2(testData1);
+const avgDogAge2 = calcAverageHumanAge2(testData2);
+console.log(avgDogAge1);
+console.log(avgDogAge2);
+
+*/
+/////////////////////////////////////////////////
+/*
+
+// The Magic of Chaining Methods
+// - lets say we wanted to take all the movement deposits**
+// - then convert them from euros to dollars
+// - then finally add them all up, so we know the total deposited in us dollars
+// - we can do all of these in one go
+
+const euroToUsd = 1.1;
+
+// PIPELINE
+const totalDepositsUSD = movements
+  .filter(mov => mov > 0)
+  .map(mov => mov * euroToUsd)
+  .reduce((acc, mov) => acc + mov, 0);
+console.log(totalDepositsUSD);
+
+// NOTE: We can only chain a method after another if the first one returns an array
+// - it's hard to debug when we chain methods, we need to be able to see the result of each method in order to know where the problem lies
+// - in order to do this we can use the array paramater that is available with all of these methods
+
+// FOR EXAMPLE
+// - if we made a mistake, we could check by adding doing this for each method, one by one, lets start at the filter method. We would check the results of this in the next part of the chain:
+
+//    .....   .map((mov, i, arr) => {
+//             console.log(arr)   // checking the array results
+//             return mov * euroToUsd;
+// })
+
+// - This allows us to see if there is an error, if there isnt
+// - If ther isnt, we can continue to check the next methods
+
+// Notes:
+// - we should try to not over use chaining methods
+// - this means creating the most efficient functionality possilbe so that we use the least amount of chaining nessecary, optimize
+// - neglecting this can cause huge performance issues
+
+// - it's a bad practice to chain methods that mutate the underlying array, ex: splice method, or reverse method
+// - you can do this, but in a large scale application its always a good practice to avoid mutating arrays, causes hard to find bugs
+
+*/
+/////////////////////////////////////////////////
+/*
+
+// Coding Challenge #3:
+// - details in video
+
+const testData1 = [5, 2, 4, 1, 15, 8, 3];
+const testData2 = [16, 6, 10, 5, 6, 1, 4];
+
+const calcAverageHumanAge = dogAges =>
+  dogAges
+    .map(dogAge => (dogAge <= 2 ? 2 * dogAge : 16 + dogAge * 4))
+    .filter(adultDogs => adultDogs >= 18)
+    .reduce((acc, age, i, arr) => acc + age / arr.length, 0);
+
+const avgDogAge1 = calcAverageHumanAge(testData1);
+const avgDogAge2 = calcAverageHumanAge(testData2);
+console.log(avgDogAge1);
+console.log(avgDogAge2);
+
+*/
+/////////////////////////////////////////////////
+/*
+
+// The find Method
+// - another very important array method
+// - we can use this method to find one element of an array based on a condition
+// - this method also accepts a callback function as an arguement which is called as the method loops over the array
+//  - like the filter method, it can use a boolean
+// - will take the first element in the array that satisfies the condition
+// - will return undefined if no elements match the condition
+
+const firstWithdrawal = movements.find(mov => mov < 0);
+console.log(movements);
+console.log(firstWithdrawal);
+
+console.log(accounts);
+
+const account = accounts.find(acc => acc.owner === 'Jessica Davis');
+console.log(account);
+
+// Doing the same thing but with a forOf loop for practise
+let accountAgain;
+
+for (let acc of accounts) {
+  // if (acc.owner === 'Jessica Davis') {
+  //   accountAgain = acc;
+  //   break;
+  // }
+
+  // terinary operator
+  accountAgain = acc.owner === 'Jessica Davis' ? acc : accountAgain;
+}
+console.log(accountAgain);
+
+// Find Index method
+// - works the same as the find method except  that it returns the index instead of the element
+
+*/
+/////////////////////////////////////////////////
+/*
+
+// some and every
+
+// SOME
+// - like the include method except that this method tests for a condition rather than equaliity
+// - returns true if one of the elements of the array meet the condition
+
+console.log(movements);
+
+// check for EQUALITY
+console.log(movements.includes(-130));
+console.log(movements.some(mov => mov === -130));
+
+// check if there have been any deposits in this account
+const anyDeposits = movements.some(mov => mov > 0);
+console.log(anyDeposits);
+
+// EVERY
+// - simillar to the some method, but only returns true if all of the elements of the array satisfy the condition
+console.log(movements.every(mov => mov > 0));
+console.log(account4.movements.every(mov => mov > 0));
+
+// Seperate callback
+// - up until now, we have always wrote the callback function's functionality within the main function
+// - we can write a function out side of the main function and reuse and update it easier, DRY principle
+
+const deposit = mov => mov > 0;
+console.log(movements.some(deposit));
+console.log(movements.every(deposit));
+console.log(movements.filter(deposit));
+
+*/
+/////////////////////////////////////////////////
+/*
+
+// flat and flatMap
+
+// FLAT METHOD
+// - take an array of arrays and makes one array with no nested arrays
+// - only goes one level deep by default
+// has a depth argument that specifies how deep you want to flatten the array
+
+const arr = [[1, 2, 3], [4, 5, 6], 7, 8];
+console.log(arr.flat());
+
+const arrDeep = [[[1, 2], 3], [4, [5, 6]], 7, 8];
+console.log(arrDeep.flat()); // doesnt work
+console.log(arrDeep.flat(1)); // depth is one, same result
+console.log(arrDeep.flat(2)); // depth is two, works
+
+// calc overall movements of all accounts for the bank
+const accountMovements = accounts.map(acc => acc.movements);
+console.log(accountMovements);
+const allMovements = accountMovements.flat();
+const overallBalance = allMovements.reduce((acc, mov) => acc + mov, 0);
+console.log(overallBalance);
+
+// with chaining
+const overallBalance2 = accounts
+  .map(acc => acc.movements)
+  .flat()
+  .reduce((acc, mov) => acc + mov);
+console.log(overallBalance2);
+
+// FLATMAP METHOD
+// - using the map method followed by the flat method is very common, so this method was created
+// - maps the array accorinding to the callback function, the flattens it
+// - can only go one level deep, there is no depth argument for this method
+
+const overallBalance3 = accounts
+  .flatMap(acc => acc.movements)
+  .reduce((acc, mov) => acc + mov);
+console.log(overallBalance2);
+
+*/
+/////////////////////////////////////////////////
+/*
+
+// Sorting Arrays
+// - can sort the array alphabetically
+// - does the sort based on strings
+// - will mutate the original array
+
+// strings
+const owners = ['Jonas', 'Zach', 'Adam', 'Martha'];
+console.log(owners.sort());
+console.log(owners);
+
+// numbers
+console.log(movements);
+console.log(movements.sort()); // does not work as expected
+
+// To fix this:
+// - we pass a callback function into the sort method
+// - we pass two arguments into this callback method that represent the current element and the next element in the array
+// - depending on the value of what is returned from the callback function, the order of the arguments will either remain the same or switch
+// - if the callback function returns a negative number, the order of the two current elements in question will remain the same
+// - if the callback function returns a positive number, they will switch positions
+
+// return < 0, A, B (keep order)
+// return > 0, B, A (switch order)
+movements.sort((a, b) => {
+  if (a > b) return 1;
+  if (b > a) return -1;
+});
+console.log(movements); //ascending
+
+// - as you can see above, we check if a is > than b, if it is we return a positive number, which tells the sort method to switch the order.
+// - if b > a we return a negative number, which tells sort to keep the order
+// - we purposely match these conditions with these returns because we wanted to sort these numbers in ascending order, if we wanted to do it in descending order, we would reverse the returns
+
+movements.sort((a, b) => {
+  if (a > b) return -1;
+  if (b > a) return 1;
+});
+console.log(movements); // descending
+
+// - we can simplify this by using a - b
+// -  a - b will either return a positive or negative depending on if b is > or < a, which mimics the functionality of both the if statements in our callback function.
+// - if a = b, then it will return 0 which does not switch the elements positions
+// this is for ascending, for descending it's b - a.
+
+movements.sort((a, b) => a - b);
+console.log(movements); // ascending
+
+movements.sort((a, b) => b - a);
+console.log(movements); // descending
+
+// - this works on strings too
+// - this does not work on arrays with strings and numbers
+
+*/
+/////////////////////////////////////////////////
+/*
+
+// More Ways of Creating and Filling Arrays
+// - so far we have been manually creating arrays with data we already have
+// - we can actually also generate arrays programatically without having to define all the items manually
+//
+
+// Manually
+console.log([1, 2, 3, 4, 5, 6, 7]);
+console.log(new Array(1, 2, 3, 4, 5, 6, 7));
+
+// Creates an array with 7 empty elements
+const x = new Array(7);
+// - this happens when we pass in only one arguement
+// - cannot really use this array for anything, like using methods on it
+// - not really useful except for one thing, using the fill method
+console.log(x);
+console.log(x.map(() => 5)); // does  nothing
+
+// Fill method
+// - first argument fills up the entire array with the specified value
+// - mutates the entire array
+// - can also specify a begin paramater, the index it starts filling from, and an end parameter, the index where it stops filling - just like the slice method
+// - does not include the last index, only up to it
+// - can be used on already existing arrays
+x.fill(1, 3, 5);
+x.fill(1);
+console.log(x);
+
+// Array.from
+// - is function object calling another method(more info later)
+// - takes an object with a length property as the first arguement
+// - takes a callback function as the second arguement
+// - the callback behaves like the map method
+// - automatically acts like the map method, do not need the keyword
+// - cleaner than using the Array and Fill methods together
+// - this method can be used on other iterables aswell
+// - ex: strings, maps, sets, also node lists from querySelctorAll
+
+const y = Array.from({ length: 7 }, () => 1);
+console.log(y);
+
+const z = Array.from({ length: 7 }, (_, i) => i + 1);
+console.log(z);
+
+// Lets say we only have the movements store in our UI and not in out code. How would we get the data and calculate the sum?
+
+// just adding handler so we can see this in action while logged in
+labelBalance.addEventListener('click', function () {
+  // This is the real example
+  const movementsUI = Array.from(
+    document.querySelectorAll('.movements__value')
+  );
+
+  // Methods work on this node list because it has been converted into an array previous
+  // - we could acutally put this in the second arguement of the array.from - as the callback function
+  console.log(movementsUI.map(el => el.textContent.replace('€', '')));
+});
+
+*/
+/////////////////////////////////////////////////
+
+// Summary: Which Array Method to Use?
+// - since the beginning of the course, we have leared 23 different array methods
+// - how do we know which one we should use in a give situation?
+// - these are all of the categories you need to keep in mind when choosing, does your problem fall under one of these? :
+// Mutate original array, Create a new array, get an array index, get an array element, Know if array includes, create a new string, transform a value, just loop an array.
+// - below will be a list of arrays that perform the task for the required category
+
+// **Mutate Original Array**
+//>Add to Original
+// - .push(end)
+// - .unshift(start)
+//>Remove from original
+// - .pop(end)
+// - .shift(start)
+// - .splice(any)
+//>Others
+// - .reverse
+// - .sort
+//  .fill
+
+// **A New Array**
+//>Computed from original:
+// - .map(loop)
+//>Filter using condition:
+// - .filter
+//>Portion of original: (or even shallow copy)
+// - .slice
+//>Adding original to other:
+// - .concat
+//>Flattening the original:
+// - .flat
+// - .flatMap
+
+// **An Array Index**
+//>Based on value:
+// - .indexOf
+//>Based on condition:
+// - .findIndex
+
+// **An Array Element**
+//>Based on test condition:
+// - .find
+
+// **Know if Array Includes**
+//>Based on value:
+// - .includes
+//>Based on test conditions:
+// - .some
+// - .every
+
+// **A New String**
+//>Based on separator
+//  - .join
+
+// **To Transform a Value**
+//>Based on accumulator
+// - .reduce (boils down all elements of an array into one value)
+
+// **Just Loop Over**
+//>Based on callback:
+// - .forEach (does not create a new array, just loops over it)
+
+/////////////////////////////////////////////////
+
+// Array Method Practice
+
+// 1. Get the sum of all deposits
+const allDepositSum = accounts
+  .flatMap(acc => acc.movements.filter(mov => mov > 0))
+  .reduce((acc, dep) => acc + dep, 0);
+console.log(allDepositSum);
+
+// 2. Count how many deposits there have been with at least $1000
+const numDeposits1000 = accounts
+  .flatMap(acc => acc.movements)
+  .filter(mov => mov >= 1000).length;
+console.log(numDeposits1000);
+
+// OR
+const numDeposits1000b = accounts
+  .flatMap(acc => acc.movements)
+  .reduce((acc, mov) => (mov >= 1000 ? ++acc : acc), 0);
+console.log(numDeposits1000b);
+
+// cannot us acc++
+// - acc++ does incriment the value, but returns the previous value
+// - we can write it the prefixed way, ++acc which works
+
+// 3. Create an object which contains the sum of deposits and withdrawals
+const sums = accounts
+  .flatMap(acc => acc.movements)
+  .reduce(
+    (sums, cur) => {
+      // cur > 0 ? (sums.deposits += cur) : (sums.withdrawals += cur);
+      sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur;
+      return sums;
+    },
+    { deposits: 0, withdrawals: 0 }
+  );
+console.log(sums);
+
+// 4.
+// this is a nice title -> This Is a Nice Title
+const convertTitleCase = function (title) {
+  const capitalize = str => str[0].toUpperCase() + str.slice(1);
+
+  const exceptions = ['a', 'an', 'the', 'and', 'but', 'or', 'on', 'in', 'with'];
+
+  const titleCase = title
+    .toLowerCase()
+    .split(' ')
+    .map(word => (exceptions.includes(word) ? word : capitalize(word)))
+    .join(' ');
+
+  return capitalize(titleCase);
+};
+// Tests
+console.log(convertTitleCase('this is a nice title'));
+console.log(convertTitleCase('this is a LONG title but not too long'));
+console.log(convertTitleCase('and here is another title with and Example'));
+// Coding Challenge #4 - see video for details
+console.log(`<<--- CODING CHALLANGE 4 --->>`);
+
+// Test Data:
+const dogs = [
+  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+  { weight: 8, curFood: 200, owners: ['Matilda'] },
+  { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+  { weight: 32, curFood: 340, owners: ['Michael'] },
+];
+
+console.log(dogs);
+console.log('-----------');
+
+// 1.
+dogs.forEach(dog => (dog.recFood = Math.trunc(dog.weight ** 0.75 * 28)));
+console.log(dogs);
+
+// 2.
+const dogDiet = function (dogs, ownerName) {
+  dogs.forEach(dog => {
+    if (dog.owners.includes(ownerName)) {
+      dog.recFood < dog.curFood * 0.9
+        ? console.log(`${ownerName}'s dog eats too little.`)
+        : '';
+      dog.recFood > dog.curFood * 1.1
+        ? console.log(`${ownerName}'s dog eats too much.`)
+        : '';
+    }
+  });
+};
+
+// 3.
+const ownersEatToMuch = dogs.flatMap(dog =>
+  dog.curFood > dog.recFood ? dog.owners : []
+);
+console.log(ownersEatToMuch);
+
+const ownersEatToLittle = dogs.flatMap(dog =>
+  dog.curFood < dog.recFood ? dog.owners : []
+);
+console.log(ownersEatToLittle);
+
+// 4.
+const dogDiet3 = function (own, str) {
+  return own.join(' and ').concat(`'s dogs eat too ${str}!`);
+};
+
+console.log(dogDiet3(ownersEatToMuch, 'much'));
+console.log(dogDiet3(ownersEatToLittle, 'little'));
+
+// 5.
+const dogPerfectDiet = dogs.some(dog => dog.curFood === dog.recFood);
+console.log(dogPerfectDiet);
+
+// 6.
+const dogsOkayDiet = dogs.some(
+  dog => dog.curFood >= dog.recFood * 0.9 && dog.curFood <= dog.recFood * 1.1
+);
+console.log(dogsOkayDiet);
+
+// 7.
+const dogsOkayDietArr = dogs.filter(
+  dog => dog.curFood >= dog.recFood * 0.9 && dog.curFood <= dog.recFood * 1.1
+);
+console.log(dogsOkayDietArr);
+
+// 8.
+const dogSort = dogs.slice().sort((a, b) => a.recFood - b.recFood);
+
+console.log(dogs);
+console.log(dogSort);
