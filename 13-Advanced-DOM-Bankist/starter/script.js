@@ -102,7 +102,6 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
   // Matching strategy
   if (e.target.classList.contains('nav__link')) {
     const id = e.target.getAttribute('href');
-    console.log(id);
     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
   }
 });
@@ -176,15 +175,135 @@ headerObserver.observe(header);
 // Reveal Sections
 const allSections = document.querySelectorAll('.section');
 
-const revealSection = function (entries, observer) {};
+const revealSection = function (entries, observer) {
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) return;
+  entry.target.classList.remove('section--hidden');
+  observer.unobserve(entry.target);
+};
 
 const sectionObserver = new IntersectionObserver(revealSection, {
   root: null,
-  threshold: 0,
+  threshold: 0.15,
 });
 
-allSections.forEach(function (section) {});
+allSections.forEach(function (section) {
+  sectionObserver.observe(section);
+  section.classList.add('section--hidden');
+});
 
+// Lazy loading images
+const imgTargets = document.querySelectorAll('img[data-src]');
+
+const loadImg = function (entries, observer) {
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) return;
+
+  //Replace src with data-src
+  entry.target.src = entry.target.dataset.src;
+  // entry.target.classList.remove('lazy-img'); // add after load event
+  entry.target.addEventListener('load', function () {
+    entry.target.classList.remove('lazy-img');
+  });
+  observer.unobserve(entry.target);
+};
+
+const imgObserver = new IntersectionObserver(loadImg, {
+  root: null,
+  threshold: 0,
+  rootMargin: '200px',
+});
+
+imgTargets.forEach(img => imgObserver.observe(img));
+
+// Slider
+
+const slider = function () {
+  const slides = document.querySelectorAll('.slide');
+  const btnLeft = document.querySelector('.slider__btn--left');
+  const btnRight = document.querySelector('.slider__btn--right');
+  const dotContainer = document.querySelector('.dots');
+
+  let curSlide = 0;
+  const maxSlide = slides.length;
+
+  // Functions
+  const createDots = function () {
+    slides.forEach(function (_, i) {
+      dotContainer.insertAdjacentHTML(
+        'beforeend',
+        `<button class="dots__dot" data-slide="${i}"></button>`
+      );
+    });
+  };
+
+  const activateDot = function (slide) {
+    document
+      .querySelectorAll('.dots__dot')
+      .forEach(dot => dot.classList.remove('dots__dot--active'));
+
+    document
+      .querySelector(`.dots__dot[data-slide="${slide}"]`)
+      .classList.add('dots__dot--active');
+  };
+
+  const goToSlide = function (slide) {
+    slides.forEach(
+      (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`)
+    );
+  };
+
+  const nextSlide = function () {
+    if (curSlide === maxSlide - 1) {
+      curSlide = 0;
+    } else {
+      curSlide++;
+    }
+
+    goToSlide(curSlide);
+    activateDot(curSlide);
+  };
+
+  const prevSlide = function () {
+    if (curSlide === 0) {
+      curSlide = maxSlide - 1;
+    } else {
+      curSlide--;
+    }
+
+    goToSlide(curSlide);
+    activateDot(curSlide);
+  };
+
+  const init = function () {
+    createDots();
+    goToSlide(0);
+    activateDot(0);
+  };
+
+  init();
+
+  // Event handlers
+  btnRight.addEventListener('click', nextSlide);
+  btnLeft.addEventListener('click', prevSlide);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') prevSlide();
+    e.key === 'ArrowRight' && nextSlide();
+  });
+
+  dotContainer.addEventListener('click', function (e) {
+    if (e.target.classList.contains('dots__dot')) {
+      const { slide } = e.target.dataset; //used destrucuring for slide property since dataset is an object
+      curSlide = slide; // could skip to this step maybe
+      goToSlide(curSlide);
+      activateDot(curSlide);
+    }
+  });
+};
+slider();
 ///////////////////////////////////////
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -833,3 +952,128 @@ console.log(h1.parentElement.children);
 // - the target element is considered intersecting or not based on the value of these thresholds
 // - everytime a threshold is passed in either direction, the callback function is called
 // - when this happens, an object containing the properties of the event of the threshold being passed is also created/updated - not sure about this but thats what it seems like
+
+//////////////////////////////////////
+
+/*
+
+//  Lifecycle DOM Events
+// - there are different events that occur in the DOM during a webpages lifecycle
+// - lifecycle meaning from the moment the page is first accessed until the user leaves it
+
+// DOM Content Loaded
+// - fired by the document as soon as the HTML is completely parsed
+// - this means the html has been completely dowloaded and converted to the DOM tree
+// - also, all scripts must be downloaded and executed before the DOM content loaded event can happen
+// - we can listen to that event
+// - since it happens on that document, we call the method on the document
+// - this event does not wait for images and other external resources to load
+// - just HTML and JavaScript need to be loaded
+
+document.addEventListener('DOMContentLoaded', function (e) {
+  console.log('HTML parsed and DOM tree bult!', e);
+});
+
+// - we can execute code that is only available after the DOM is available, in fact - we want all our code only to be executed after the DOM is ready
+// - this is the reason we put the script tag at the end of our HTML body, its the last thing that is going to be read in the HTML
+// - the browser only finds our script after the rest the HTML is already parsed anyway
+// - if we have our script tag at the end of the HTML, we do not need to listen for the DOMContentLoading event
+
+// - there are other ways of loading the JS file with the script tag (will cover later)
+
+// Load Event:
+// - is fired by the window as soon as not only the HTML is parsed but also all the images and external resources like CSS files are also loaded
+// - basically, when the complete page is finished loading is when this event is fired
+// - we can also listen to this event
+
+window.addEventListener('load', function (e) {
+  console.log('Page fully loaded', e);
+});
+
+// Before Unload event
+// - also gets fired on the window object
+// - created immediately before a user is about to leave a page e.g. after clicking the close button on the browser tab
+// - can use this event to ask users if they are 100% sure that they want to leave the page
+// - in some browsers, you need to prevent the default behaviour in order for this to work, in chrome it is not necessary
+// - must set the return value of the event to an empty string in order for this to work
+// - this is for historical reasons, before, developers used to be able to customize the pop up message, but people started to abuse this. Now there is only a generic message
+
+// window.addEventListener('beforeunload', function () {
+//   e.preventDefault();
+//   console.log(e);
+//   e.return = '';
+// });
+
+// This feature should not be abused, it is pretty intrusive - should only be displayed when necessary. For example, if the user is in the middle of filling out a form or writing a blog post - anytime information can be lost upon closing the browser
+
+*/
+
+//////////////////////////////////////
+
+// Efficient Script Loading: Defer and Async
+// =========================================
+
+// - up to this point, we have been using the REGULAR way of including JS files into our html - by just using the "script" tag at the end of our HTML
+// - however, we can also add the "async" or "defer" attributes to the original script tag
+// - these attributes influence the way the JS file is fetched, aka downloaded - and then executed
+// - in the HTML, we can write the script tag in the document head or the bottom of the document body
+
+// Including the Regular script tag in the HEAD:
+// ---------------------------------------------
+// - as the user loads the page and receives the HTML, the HTML code wil start to be parsed by the browser
+// - parsing the HTML is basically building the DOM tree from the HTML elements
+// - then at a certain point, it will find our script tag, start to fetch the script and then execute it
+// - during all this time, the HTML parsing will actually stop, it will be waiting for the script to get fetched and executed
+// - only after that, the rest of the HTML can be parsed
+// - at the end of that parsing, the DOMContenetLoaded event will finally get fired
+// - this is NOT ideal at all, we don't want the browser just sitting there doing nothing because this can have a huge impact on the pages performce
+// - plus in this case, the script will actually be executed before the DOM is ready
+// - NEVER do this, never include the script in the HEAD
+// - that's why we usually put the script at the end of the BODY, so that all the HTML is already parsed when it finally reaches the script tag
+
+// Including the Regular script tag in the BODY end:
+// -------------------------------------------------
+// - HTML is parsed
+// - script tag is found at the end of the document
+// - then the script is fetched
+// - finally the script gets executed
+// - DOMContendLoaded event
+// - much more ideal, but still not perfect
+// - this is because the script could have been dowloaded first while the HTML was still being parsed
+
+// Async within the HEAD:
+// ----------------------
+// - the script is loaded at the same time as the HTML is parsed, in an asynchronous way
+// - that's already an advantage, however - the HTML parsing still stops for the script execution
+// - the script is downloaded asychronously - but then it's executed right away in a sychronous way - so the HTML code has to wait to be parsed
+// - this still makes loading times shorter compared to the previous two methods
+
+// Defer withing the HEAD:
+// -----------------------
+// - script is still loaded asynchronously, but the execution of the script is defered until the end of the HTML parsing
+// - so in practice, the loading time is simillar to the ASYNC attribute - but the key difference with the DEFER attribute is that the HTML parsing is never interupted because the script is only executed at the end
+// - usually, this is exactly what we want
+
+// ASYNC AND DEFER in the BODY:
+// ----------------------------
+// - doesn't make sense to use these in the body
+// - this is because in the body, fetching and executing the script always happen after parsing the HTML anyway
+// - this means ASYNC and DEFER have no practical effect there
+
+// - Besides the REGULAR script tag in the head - which is completely ruled out, there are use cases for all of these methods:
+
+// END OF BODY:
+// - scripts are fetched and executed after the HTML is completely parsed
+// - used if you need to support old browsers
+
+// ASYNC IN HEAD:
+// - scripts are fetched asynchronously and executed immediately
+// - Usually the DOMContentLoaded event waits for ALL scripts to execute, except for async scripts. So, DOMContenetLoaded does NOT wait for an async script
+// - scripts NOT guaranteed to execute in order
+// - use for 3rd-party sripts where order doesn't matter (e.g. Google Analytics)
+
+// DEFER IN HEAD:
+// - scripts are fetched asynchronously and executed after the HTML is completely parsed
+// - DOMContenetLoaded event fires after defer script is executed
+// - scripts are executed in order
+// - this is overall the best solution! Use for your own scripts and when order matters (e.g. including a library)
