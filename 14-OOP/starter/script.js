@@ -356,6 +356,8 @@ mercedes.brake();
 
 //////////////////////////////////
 
+/*
+
 // ES6 Classes
 // ===========
 // - they do the exact same thing as constructor functions, but with a nicer, more modern syntax
@@ -416,3 +418,436 @@ jessica.greet();
 // 3. The body of a class is always executed in strict mode
 
 // You can use either constructor functions or classes, its based on preference. However, es6 classes are probably more popular as well as generally neater
+
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Setters and Getters
+// ===================
+// - every object in JS can have Setter and Getter properties
+// - we call these special properties "asessor" properties
+// - as we know, the more normal properties are called data properties
+// - Getters and Setters are basically functions that get and set a value
+// - however, on the outside, they still look like regular properties
+// - to specify that a method is a setter or a getter, we prepend the methods identifier with either set or get
+// - we don't have to call this method, we use it as if it were a property
+// - this can be very useful when we want to read something as a property, but still need to do some calculations before
+
+// - each identifier can have a setter and a getter assigned to them, so you can use the same identifier to set or get a vakue - this is not mandatory though, you can also use just the setter or the getter
+// - set requires exactly one argument
+// - remember that a setter is like a property, so we dont pass an argument through a function call, instead we assign it a value in order to pass an argument
+
+const account = {
+  owner: 'jonas',
+  movements: [200, 530, 120, 300],
+
+  get latest() {
+    return this.movements.slice(-1).pop();
+  },
+
+  set latest(mov) {
+    this.movements.push(mov);
+  },
+};
+
+console.log(account.latest);
+
+account.latest = 50;
+console.log(account.movements);
+
+// - classes also have setters and getters, and they work in the exact same way
+
+class PersonCl {
+  constructor(fullName, birthYear) {
+    // this.fullName triggers the setter/getter for its identifier
+    this.fullName = fullName;
+    this.birthYear = birthYear;
+  }
+
+  // Instance methods
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  }
+
+  greet() {
+    console.log(`Hey ${this.fullName}`);
+  }
+
+  get age() {
+    return 2037 - this.birthYear;
+  }
+
+  // Creating a setter on a class's parameter
+  // - anytime an instance is created and the fullName paramater is passed, and the constructor assigns the paramater this setter will be executed
+  // this is because it is assigned by using "this.fullName" which is technically "jessica.fullName" which is how we call our setters and getters as well. This creates a conflict
+  // - we can't call this.fullName within the setter again because it will cause a loop where it will just keep calling itself, so we assign the validated value on a new variable name - we just add an underscore to the original identifier which is the normal convention
+  // - we then program the getters behaviour to return this new variable so that it is stored in the original identifier when ever it is called
+  // - by doing this, we validate the fullName, keep track of the original parameter passed to the class, and then assign that value to the original identifier if it is valid
+  
+  set fullName(name) {
+    console.log(name);
+    if (name.includes(' ')) this._fullName = name;
+    else alert(`${name} is not a full name!`);
+  }
+
+  get fullName() {
+    return this._fullName;
+  }
+
+  // Static method
+  static hi = function () {
+    console.log('Hi there 👋');
+  };
+}
+
+const jessica = new PersonCl('Jessica Davis', 1996);
+console.log(jessica);
+console.log(jessica.age); // getter
+
+// - setters and getters can be very useful for data validation
+
+//////////////////////////////////
+
+// Static Methods
+// ==============
+// - some methods can be attatched to a constructor instead of being attatched to the prototype property of that constructor.. BIG DIFFERENCE
+// - this means that the methods that are only attached to the constructor and not the prototype property of that constructor, do not get inherited by instances.
+// - in other words, they are only available to the constructor function/ class, and not any instances created by them
+// - these are static methods
+
+// - we say these methods are in their constructors "name space"
+// - these static methods are seen as helpers to their constructor
+// - to add a static method, we simply assign the method to the constructor function/ class
+
+PersonCl.hey = function () {
+  console.log('Hey there 👋');
+};
+
+PersonCl.hey(); // works fine
+PersonCl.hi(); // static method we added in last section
+// jessica.hey(); // did not inherit this static function, bug
+// jessica.hi(); // same problem
+
+// - methods that are contained in the constructor's prototype property are inherited by the instances that are created from them. These methods are called "instance methods"
+// - methods that are contained in the constructor itself and NOT the prototype property are not inherited by its instances, and are called "static methods"
+
+// (Rewatch lecture for a better example)
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Object.create
+// ==============
+// - we learned about constructor functions and ES6 Classes..
+// - there is actually a third way of implementing prototypal inheritance/delegation, which is by using a function called: Object.create
+// - works in a pretty different way than the previous two ways
+
+// - with Object.create, there is still the idea of prototypal inheritance
+// - however, there are no prototype properties involved, no constructor functions, and no new operator
+// - instead, we can use Object.create to essentially manually set the prototype of an object to any other object that we want
+
+// Lets recreate the Person class from earlier, but as an object, this is going to be the prototype of all the Person objects
+
+const PersonProto = {
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  },
+
+  // setting properties programmatically
+  init(firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+  },
+};
+
+// - call Object.create()
+// - pass in the object that we want to be the prototype of the new object
+// - store the returned object in a new variable
+// - this new object is linked to the object we passed to the function
+const steven = Object.create(PersonProto);
+
+console.log(steven);
+steven.name = 'Steven';
+steven.birthYear = 2002;
+steven.calcAge();
+
+console.log(steven.__proto__ === PersonProto); // true
+
+// setting properties programmatically
+const sarah = Object.create(PersonProto);
+sarah.init('Sarah', 1979);
+sarah.calcAge();
+// - in practise, this is actually the least used way of implementing prototypal inheritance
+// - it is still very important to know how this works because you will most likely run into this in the real world
+// - we actully can use Object.create to link prototypes in order to implement inheritance between classes (next lecture)
+// Recap: Object.create() creates a new object, and the prototype of that object will be the object that we pass in as an argument
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Coding Challenge #2
+// ===================
+
+// (see video for details)
+
+// Creating Class
+class Car {
+  constructor(make, speed) {
+    this.make = make;
+    this.speed = speed;
+  }
+
+  // Instance Methods
+  accelerate() {
+    console.log(`${(this.speed += 10)} km/h`);
+  }
+
+  brake() {
+    console.log(`${(this.speed -= 5)} km/h`);
+  }
+
+  // Getters and Setters
+  get speedUS() {
+    return this.speed / 1.6;
+  }
+
+  set speedUS(speed) {
+    this.speed = speed * 1.6;
+  }
+}
+
+// Creating two instances of the Car class
+const car1 = new Car('BMW', 120);
+const car2 = new Car('Mercedes', 95);
+
+// Test1
+car1.accelerate();
+car1.accelerate();
+car1.accelerate();
+car1.brake();
+car1.brake();
+
+// Test2
+car2.accelerate();
+car2.accelerate();
+car2.brake();
+car2.brake();
+car2.brake();
+
+// Creating third instance of the Car class for the last part
+const car3 = new Car('Ford', 120);
+
+console.log(car3);
+
+car3.accelerate();
+car3.accelerate();
+car3.brake();
+car3.brake();
+
+console.log(car3.speedUS);
+console.log(car3.speed);
+console.log((car3.speedUS = 100));
+console.log(car3.speed);
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Inheritance Between Classes: Constructor Functions:
+// ==================================================
+// - so far we've learned how objects inherit methods and properties through their prototypes,, using constructor functions, ES6 classes and Object.create
+// - in other words, we learned how objects delegate their behaviour to their prototype
+
+// - now its time to turn our attention to more "real" inheritance
+// - what this means is real inheritance between classes, not just prototypal inheritance between instances and their prototypes
+// - we're using class terminology here because it makes it easier to understand, but we already know that real classes do not exist in JS
+
+// Lets create a new Student class, and let it inherit from the Person class that we've been using so far:
+// - Person will be the parent class, Student will be the child class
+// - this is because a Student is basically a sub-type of a person
+// - a student is also a person, but is a more specific type of a person - so this is an ideal child class
+
+// - This is really useful because with this inheritance set up we can have specific methods for the student, and also allow the student to use generic Person methods, like calcAge()
+// - this is basically the idea of inheritance between classes
+
+// - We will start by implementing this using constructor functions to inherit between classes
+
+// Parent Class
+const Person = function (firstName, birthYear) {
+  this.firstName = firstName;
+  this.birthYear = birthYear;
+};
+
+Person.prototype.calcAge = function () {
+  console.log(2037 - this.birthYear);
+};
+
+// Child Class
+// - same functionality as parent (same parameters)
+// - additional functionality added
+const Student = function (firstName, birthYear, course) {
+  // - Same functionality as Parent, don't do this:
+  // this.firstName = firstName;
+  // this.birthYear = birthYear;
+
+  // - We can just call the Person function instead
+  // - However we cannot call the Person function normally
+  // - we need to set the "this" keyword
+  // - we can do this using the "call" method
+  Person.call(this, firstName, birthYear);
+  this.course = course;
+};
+
+// Linking prototypes:
+Student.prototype = Object.create(Person.prototype);
+
+Student.prototype.introduce = function () {
+  console.log(`My name is ${this.firstName} and I study ${this.course}`);
+};
+
+// Creating a Student instance
+const mike = new Student('Mike', 2020, 'Computer Science');
+mike.introduce();
+console.log(mike);
+mike.calcAge();
+
+// Using Object.create made this = Person, lets fix it
+Student.prototype.constructor = Student;
+console.log(mike instanceof Student); // true
+console.log(mike instanceof Person); // true
+console.log(mike instanceof Object); // true
+console.log(mike);
+
+// Remember:
+// - all functions are objects
+// - all objects have a prototype (__proto__)
+// - all functions have a prototype property**
+// - this property contains what is inherited by its instances
+// - objects do not have a prototype property
+
+// - the prototype property of a function is a simple object that contains the methods and sometimes data that instances created from that function will inherit
+
+// - Student.prototype is an object
+// - Person.prototype is also an object
+// - if we assign the return value of Object.create(Person.prototype) to Student.prototype, what we are actually doing is making the prototype(__proto__) of Student.prototype = Person.prototype, so essentially: Student.prototype.__proto__ === Person.prototype
+
+// How it works
+// 1. we create a new instance of the Student constructor using the "new" keyword to call the Student constructor
+
+// 2.
+// a) the "new" keyword creates a new empty object
+// b) it then assigns the "this" keyword of the constructor to this new object.
+// c) then the new object is linked to the constructor, I assume this is by creating the "__proto__" property, which equals(or points too, not sure) the constructors "prototype" property. They are the same object in memory.
+// d) then the implementation of the constructor is executed and the new object is returned and saved in a variable that we called "mike"
+
+// 3. We pass the Person.prototype object to the Object.create function:
+// a) this returns an empty object, remember that all objects have prototypes
+// b) this empty object has the __proto__ property that points to the Person.prototype object we passed as an argument
+// c) this empty object is returned and we then assign it to the Student.prototype property.
+// d) once this has happened, the two constructors are linked, we can now add methods specific to the child function. If we had added the specific methods first - they would have been overwritten once we used Object.create to link the constructors.
+// e) these steps also change what Student.prototype.constructor property should be, it ends up being inherited to equal Person, when it should equal Student. So we simply assign that property the correct value. The constructor property can be important so it is important to do
+
+// (we are essentially assigning the prototype of a prototype of an instance... in other words.. we are taking an instances prototype and assigning it a prototype(__proto__)... in other words.. we are taking a constructor function, creating a child constructor function from it, then creating an instance from that child function)
+
+// So now..
+// mike.__proto__ is linked to Student.prototype...
+// Student.prototype.__proto__ is linked to Person.prototype
+// Person.prototype.__proto__ is linked to function.prototype..
+// Function.prototype.__proto__ is liked to Object.prototype...
+// Object.prototype.__proto__ is null usually
+
+// NOTE:
+// - "mike" is an instance of the Student constructor
+// - it is an object, so it has a "__proto__" property, which in this case points to Student.prototype. This is what links them.
+
+// - now Student constructor is a child of the Person constructor
+// - the Student constructor has a prototype property as well.
+// - Student.prototype is also an object, meaning that it also has a "__proto__" property, which in this case points to Person.prototype. This is what links them.
+
+console.log('=======');
+console.log(mike);
+console.log(mike.__proto__ === Student.prototype);
+console.log(Student.prototype);
+console.log(Student.prototype.__proto__ === Person.prototype);
+
+// prototype of Student constructor, not related - confused me
+// console.log(Student.__proto__);
+
+*/
+
+//////////////////////////////////
+
+// Coding Challenge #3
+// ===================
+
+// (Watch video for details)
+
+// Creating Parent Constructor Function
+const Car = function (make, speed) {
+  this.make = make;
+  this.speed = speed;
+};
+
+Car.prototype.accelerate = function () {
+  console.log(`${(this.speed += 10)} km/h`);
+};
+
+Car.prototype.brake = function () {
+  console.log(`${(this.speed -= 5)} km/h`);
+};
+
+// Creating Child Constructor Function
+const EV = function (make, speed, charge) {
+  // Parent functionallity
+  Car.call(this, make, speed);
+
+  // Additional functionality
+  this.charge = charge;
+};
+
+// Link prototypes
+EV.prototype = Object.create(Car.prototype);
+EV.prototype.constructor = EV;
+
+// Adding methods to child constructor
+EV.prototype.chargeBattery = function (chargeTo) {
+  if (chargeTo < 0 || chargeTo > 100)
+    return console.log(`Must be between 0 and 100`);
+  this.charge = chargeTo;
+  console.log(`Successfully charged to ${chargeTo}%`);
+};
+
+// Polymorphism of parent method
+EV.prototype.accelerate = function () {
+  this.speed += 20;
+  this.charge--;
+  console.log(
+    `${this.make} going at ${this.speed} km/h, with a charge of ${this.charge}%`
+  );
+};
+
+const car1 = new EV('Tesla', 120, 23);
+car1.chargeBattery(50);
+car1.chargeBattery(-1);
+car1.chargeBattery(101);
+car1.chargeBattery(90);
+
+car1.accelerate();
+car1.accelerate();
+car1.brake();
+car1.brake();
+car1.brake();
+
+console.log(car1);
