@@ -789,6 +789,8 @@ console.log(Student.prototype.__proto__ === Person.prototype);
 
 //////////////////////////////////
 
+/*
+
 // Coding Challenge #3
 // ===================
 
@@ -849,5 +851,498 @@ car1.accelerate();
 car1.brake();
 car1.brake();
 car1.brake();
+
+console.log(car1);
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Inheritance Between "Classes": ES6 Classes:
+// ===========================================
+// - the class syntax hides a lot of details that are actually happening behind the scenes
+// - this is because classes are really just a layer of abstraction over constructor functions
+// - this is not a problem if you already learned how inheritance between classes actually works behind the scenes, which we should by now
+
+// - to implement inheritance between es6 classes we only need 2 ingredients:
+// -> the "extends" keyword
+// -> the "super" function
+
+// - the "extends" keyword links the prototypes behind the scenes
+// - the "super" function is basically the constructor function of the parent class - which we pass in the arguments specified in the parent class.. it also sets the "this" keyword somehow and therefor must be called before anyother assignments
+
+// Parent Class
+class PersonCl {
+  constructor(fullName, birthYear) {
+    // this.fullName triggers the setter/getter for its identifier
+    this.fullName = fullName;
+    this.birthYear = birthYear;
+  }
+
+  // Instance methods
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  }
+
+  greet() {
+    console.log(`Hey ${this.fullName}`);
+  }
+
+  get age() {
+    return 2037 - this.birthYear;
+  }
+
+  set fullName(name) {
+    if (name.includes(' ')) this._fullName = name;
+    else alert(`${name} is not a full name!`);
+  }
+
+  get fullName() {
+    return this._fullName;
+  }
+
+  // Static method
+  static hi = function () {
+    console.log('Hi there 👋');
+  };
+}
+
+// Child Class
+// - we declare the child class as usual, stating that it is a class - and the desired identifier, in this case "Student"
+// - we then use the "extends" keyword, followed by the parent class, aka the class we want to inherit from
+
+// Note: We dont NEED a third parameter, we add it if we want to. If a child class has the same arguments as its parents, all it means is that there are only new methods being added. When this is the case - the super function is automatically called, meaning you don't need to have a constructor function
+
+class StudentCl extends PersonCl {
+  constructor(fullName, birthYear, course) {
+    // Always needs to happen first
+    // - "super()" is responsible for creating the this keyword in this subclass
+    super(fullName, birthYear);
+    this.course = course;
+  }
+
+  //
+  introduce() {
+    const { fullName, course } = this;
+    console.log(`My name is ${fullName} and I study ${course}`);
+  }
+
+  calcAge() {
+    console.log(
+      `I'm ${this.age} years old, but as a student I feel more like ${
+        this.age + 10
+      }`
+    );
+  }
+}
+
+const martha = new StudentCl('Martha Jones', 2012, 'Computer Science');
+martha.introduce();
+martha.calcAge();
+console.log(martha);
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Inheritance between "Classes": Object.create:
+// ============================================
+// - lets look at how we can use Object.create in order to implement a complex prototype chain
+
+// Prototype Object
+
+// Parent Prototype
+const PersonProto = {
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  },
+
+  init(firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+  },
+};
+
+const steven = Object.create(PersonProto);
+
+// Child Prototype
+// - thats it, the prototype is linked
+// - we can now use it to create instances
+const StudentProto = Object.create(PersonProto);
+StudentProto.init = function (firstName, birthYear, course) {
+  PersonProto.init.call(this, firstName, birthYear);
+  this.course = course;
+};
+
+StudentProto.introduce = function () {
+  console.log(`My name is ${this.firstName} and I study ${this.course}`);
+};
+
+// - this makes the StudentProto object jay's prototype
+// - StudentProto object's prototype is the PersonProto object
+// - so jay inherits from both objects because of the chain
+const jay = Object.create(StudentProto);
+console.log(jay);
+jay.init('Jay', 2010, 'Computer Science');
+jay.introduce();
+jay.calcAge();
+
+// In this version, we dont worry about constructors, prototype.property or even about the "new" operator
+// Its really just objects linked to other objects
+// Some people believe that this pattern is a lot better than trying to fake classes in JS
+
+// - when we use constructor functions or ES6 Classes, we are just faking classes, classes don't really exist in JS
+// - however, these two methods of OOP are much more common that using Object.create
+// - using ES6 classes is actually the most common method of OOP in the real world, so it is very important to master them
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Another Class Example:
+// ======================
+// - there are a few more things that we have to learn about classes
+
+class Account {
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    this.pin = pin;
+
+    //Creating a generic property, no argument needed
+    // - all instances will have this exact property and value
+    // - this is what we intend
+    this.movements = [];
+    this.locale = navigator.language;
+
+    // Can also execute anycode that we want while inside the constructor
+    console.log(`Thanks for opening an account, ${owner}`);
+  }
+
+  // Public Interface (API)
+  deposit(val) {
+    this.movements.push(val);
+  }
+
+  withdraw(val) {
+    this.deposit(-val);
+  }
+
+  approveLoan(val) {
+    return true;
+  }
+  //
+  requestLoan(val) {
+    if (this.approveLoan(val)) {
+      this.deposit(val);
+      console.log('Loan approved');
+    }
+  }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+console.log(acc1);
+
+// Deposits and Withdrawls:
+// ========================
+
+// Not a good idea AT ALL to do it this way:
+// acc1.movements.push(250);
+// acc1.movements.push(-140);
+
+// MUCH Better to do it this way:
+acc1.deposit(250);
+acc1.withdraw(140); //abstracts the the negative operator
+
+// -instead of interacting with a property like this, its a lot better to create methods that interact with these properties
+// - especially true with important properties such as these movements
+// - this will help avoid bugs in the future as the application grows
+// - these methods are know as the public interface, they are the inteface to our objects AKA API
+
+// - there is nothing stopping someone on our team with interacting with the movement array and potentially introducing bugs
+// - we can also still access the pin from outside of the class, which shouldn't be the case
+// - this is a very real and very important concern
+// - the same goes for methods like the approveLoan method - which should only be able to be accessed by the requestLoan method
+
+acc1.requestLoan(1000);
+acc1.approveLoan(1000); // shouldn't be allowed to access this
+acc1.pin(1111); // shouldn't be allowed to access this
+
+// - this shows why we really need data encapsulation and data privacy
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Encapsulation: Protected Properties and Methods
+// ===============================================
+// - we now understand the need for encapsulation and data privacy
+// - lets implement this OOP principle now
+
+// ENCAPSULATION:
+// --------------
+// - basically means to keep some properties and methods private inside the class
+// - this is so that they are not accessible from outside of the class
+// - the rest of the methods are "exposed" as a public interface, which we can also call "API"
+// - this is essential to do in anything more than a toy applicaation
+
+// Two big reasons why we need encapsulation and data privacy:
+// -----------------------------------------------------------
+// a) To prevent code from outside a class from accidentally manipulating our data inside the class
+// b) when we expose only a small interface, we can change all the other internal methods with more confidence, because in this case we can be sure that external code does not rely on these private methods - therefor our code will not break when we do internal changes
+
+// NOTE:
+// -----
+// - JS classes actually do not yet support REAL data privacy and encapsulation
+// - there is a proposal to add truely private class fields and methods to the language, but it's not completely ready yet
+// - we will basically FAKE encapsulation by simply using a convention
+
+class Account {
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    this._pin = pin; //protected
+
+    // The convention is to add an underscore before data we want to encapsulate:
+    // - it's not truely private, we call it protected
+    // - data is still accessible, but atleast everyone on your team including yourself, knows that this property is not supposed to be touched outside of the class
+    this._movements = [];
+    this.locale = navigator.language;
+
+    console.log(`Thanks for opening an account, ${owner}`);
+  }
+
+  // Public Interface (API)
+  deposit(val) {
+    this._movements.push(val);
+  }
+
+  withdraw(val) {
+    this.deposit(-val);
+  }
+
+  _approveLoan(val) {
+    // protected
+    return true;
+  }
+  //
+  requestLoan(val) {
+    if (this.approveLoan(val)) {
+      this.deposit(val);
+      console.log('Loan approved');
+    }
+  }
+
+  // Public Method that allows access to the movement array
+  getMovements() {
+    return this._movements;
+  }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+console.log(getMovements);
+console.log(acc1);
+
+*/
+
+//////////////////////////////////
+
+/*
+
+// Encapsulation: Private Class Fields and Methods:
+// ================================================
+// - not yet part of the JS language yet, but it is likely that it will be some point soon in the future
+// - some parts already work in Google Chrome, some don't
+// - properties are usually called 'fields' in traditional OOP languages
+
+// 1)Public fields
+// 2)Private fields
+// 3)Public methods
+// 4)Private methods
+// (there is also the static version of these 4)
+
+// - We can think of a field as a property that will be on all instances (_movements and locale)
+// - note that the properties that require us to pass in arguments are not considered fields
+// - fields have to be set outside of the construcor and any methods
+
+// 1)
+// - we declare "public fields" before the constructor as shown below, we don't need to use let or const to declare them
+// - these are only added to the instances, and not the prototype
+// - the public fields are also referenceable by the "this" key word
+
+// 2)
+// - we declare  "private fields" the same way that we delare a public field, except the identifer must be preceeded by a hashtag (#) as shown below.
+// - this is the actual name of this field and has to be refrenced as such if you want to use it
+
+// 3)
+// - "public methods" work exactly the same as the last lecture, not much to talk about - we already know how these work
+
+// 4)
+// - "private methods" are avery useful to hide the implementation details from the outside
+// - it uses the same syntax(#) to make fields private
+// - not really implemented properly yet
+
+class Account {
+  // 1)Public fields
+  locale = navigator.language;
+
+  // 2)Private fields
+  #movements = [];
+  #pin; // will assign later
+
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    this.#pin = pin; //assigning a private field an argument val
+
+    // this._movements = [];
+    // this.locale = navigator.language;
+
+    console.log(`Thanks for opening an account, ${owner}`);
+  }
+
+  // 3) Public Methods
+
+  // Public Interface (API)
+  deposit(val) {
+    this.#movements.push(val);
+  }
+
+  withdraw(val) {
+    this.deposit(-val);
+  }
+
+  requestLoan(val) {
+    if (this.#approveLoan(val)) {
+      this.deposit(val);
+      console.log('Loan approved');
+    }
+  }
+
+  // Public Method that allows access to the movement array
+  getMovements() {
+    return this.#movements;
+  }
+
+  // 4) Private Methods
+  #approveLoan(val) {
+    return true;
+  }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+
+acc1.deposit(250);
+acc1.withdraw(140);
+acc1.requestLoan(1000);
+console.log(acc1.getMovements()); // can still use API
+console.log(acc1);
+
+// console.log(acc1.#movements); //cannot access private field
+// console.log(acc1.#pin); // cannot access private field
+// console.log(acc1.#approveLoan(100)); //cannot access
+
+*/
+
+//////////////////////////////////
+
+// Coding Challenge #4
+
+// (Details in the description)
+
+// Parent Class
+class CarCl {
+  constructor(make, speed) {
+    this.make = make;
+    this.speed = speed;
+  }
+
+  accelerate() {
+    console.log(`${(this.speed += 10)} km/h`);
+    return this;
+  }
+
+  brake() {
+    console.log(`${(this.speed -= 5)} km/h`);
+    return this;
+  }
+}
+
+// Child Class
+class EVCl extends CarCl {
+  // Private fields
+  #charge;
+
+  constructor(make, speed, charge) {
+    super(make, speed);
+    this.#charge = charge;
+  }
+
+  // API
+  chargeBattery(chargeTo) {
+    if (chargeTo < 0 || chargeTo > 100)
+      return console.log(`Must be between 0 and 100`);
+    this.#charge = chargeTo;
+    console.log(`Successfully charged to ${chargeTo}%`);
+    return this;
+  }
+
+  accelerate() {
+    this.speed += 20;
+    this.#charge--;
+    console.log(
+      `${this.make} going at ${this.speed} km/h, with a charge of ${
+        this.#charge
+      }%`
+    );
+    return this;
+  }
+}
+
+class SuperCl extends EVCl {
+  constructor(make, speed, charge, boost) {
+    super(make, speed, charge);
+    this.boost = boost;
+  }
+
+  // API
+  myColor() {
+    console.log(`My car's boost is ${boost}`);
+  }
+}
+
+//
+
+//
+const car1 = new SuperCl('Rivian', 120, 23, 1.5);
+car1.chargeBattery(50);
+car1.chargeBattery(-1);
+car1.chargeBattery(101);
+car1.chargeBattery(90);
+
+car1.accelerate();
+car1.accelerate();
+car1.brake();
+car1.brake();
+car1.brake();
+
+car1
+  .accelerate()
+  .accelerate()
+  .accelerate()
+  .accelerate()
+  .brake()
+  .brake()
+  .brake()
+  .brake()
+  .chargeBattery(99);
 
 console.log(car1);
