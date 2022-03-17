@@ -163,11 +163,23 @@ if (navigator.geolocation) {
 // .on
 // ===
 // - very similar to addEventListener
-// - we can specify an event as the first argument
+// - we can specify a type of event as the first argument
 // - second argument is a callback as an argument which is passed the 'mapEvent' event
 // - when leaflet calls this call-back function, it will do so with a special map event, which is an event created by leaflet, which we called 'mapEvent'
 // - if we console log this event, it will appear in the log everytime we click on the map. If we look at the events properties we can find a property called 'latlng', where we can see what the coordinates are for the area of the map we clicked
-// - now we just need to make a marker appear every time we click the map, which we can do by using the code we used to show our location with a marker in the beginning
+// - now we just need to make a marker appear every time we click the map, which we can do by using the code we copied from the leaflet website to show our location with a marker in the beginning
+
+// - now the marker is showing up, but its pop up message dissapears when we click on a new location on the map, we don't want this behaviour
+// - we also want to add some custom formatting to these pop ups, we can do this because Leaflet allows you to add your own class names to the pop up
+// - the L.marker method allows you to define the position of where your marker is placed
+// - the L.addTo method allows you to add this marker to the map object, and displays the marker
+// - the L.bindPopup method allows you to define and attach a popup message to the marker - we can simply pass in a string, however, instead of that we can also create a brand new pop up object which will then contain a couple of options
+// - we do that by passing the L.popUp method to previously mentioned L.bindPopUp method
+// - L.popUp takes an object as an argument
+
+// - remember that all of this is in the documentation on the Leaflet website... every library that we use will have some docutmentation, otherwise we would not know how to use their API
+// - on leaflet, there is a tab called "Docs", which is where all the documentation is
+// - as we can see on from the documentation, we can add options to the marker itself aswell as the popup message
 
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(
@@ -196,7 +208,20 @@ if (navigator.geolocation) {
 
         const { lat, lng } = mapEvent.latlng;
 
-        L.marker([lat, lng]).addTo(map).bindPopup('Workout').openPopup();
+        L.marker([lat, lng])
+          .addTo(map)
+          .bindPopup(
+            // Setting pop up Propeprties
+            L.popup({
+              maxWidth: 250,
+              minWidth: 100,
+              autoClose: false,
+              closeOnClick: false,
+              className: 'running-popup',
+            })
+          )
+          .setPopupContent('Working')
+          .openPopup();
       });
     },
     function () {
@@ -204,3 +229,9 @@ if (navigator.geolocation) {
     }
   );
 }
+
+/////////////////////////////////////////////////
+
+// Rendering Workout Input Form
+// ============================
+// - we want this to render whenever the user clicks on the map
