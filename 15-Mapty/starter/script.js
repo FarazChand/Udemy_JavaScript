@@ -11,6 +11,9 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+// Global Variables for access
+let map, mapEvent;
+
 ///////////////////////////////////////////////////
 /*
 
@@ -142,6 +145,7 @@ if (navigator.geolocation) {
 
 */
 /////////////////////////////////////////////////
+/*
 
 // Displaying Map Marker
 // ====================
@@ -230,8 +234,87 @@ if (navigator.geolocation) {
   );
 }
 
+*/
 /////////////////////////////////////////////////
 
 // Rendering Workout Input Form
 // ============================
 // - we want this to render whenever the user clicks on the map
+// - we want this to happen before the marker actually pops up on the map, we don't want the marker to even pop up until the form has been submitted
+// - so we want to render the form when the map is clicked, then when the form is submitted, we want to place a map marker in the location at which the map was clicked
+// - this means that we need to add the from rendering to the map objects event listener, and then create an event listener for the submit button on the form that causes the marker to pop up
+
+// - in our html, the form has the class of "form" and "hidden", so we will be using DOM manipulation to add/remove the hidden class
+
+// Checking if browser supports the geolocation API
+if (navigator.geolocation) {
+  // Calling the geolocation API
+  navigator.geolocation.getCurrentPosition(
+    function (position) {
+      // Getting the coords from the position objects properties
+      const { latitude } = position.coords;
+      const { longitude } = position.coords;
+
+      // Storing the position properties in an array
+      const coords = [latitude, longitude];
+
+      // Created map object and stored results in the map varialbe
+      // - Note that the map variable is global
+      // - passed the coords and the zoom level to setView
+      map = L.map('map').setView(coords, 14);
+
+      // Creating and adding tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.fr/hot/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      // Creating and adding initial marker on current position
+      L.marker(coords)
+        .addTo(map)
+        .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+        .openPopup();
+
+      // Adding the leaflet event handler to the map object
+      // - handling clicks on map
+      map.on('click', function (mapE) {
+        // Assigning the global variable the value of the mapE
+        // - this is so we can access the event elsewhere
+        mapEvent = mapE;
+
+        // Render the form
+        form.classList.remove('hidden');
+
+        // Focus on the Distance input field after form renders
+        inputDistance.focus();
+      });
+    },
+    function () {
+      alert('Could not get your position');
+    }
+  );
+}
+
+// Adding event handler to the form when submitting
+// - the enter key will be used for this
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  // Display marker
+  console.log(mapEvent);
+  const { lat, lng } = mapEvent.latlng;
+  L.marker([lat, lng])
+    .addTo(map)
+    .bindPopup(
+      // Setting pop up Propeprties
+      L.popup({
+        maxWidth: 250,
+        minWidth: 100,
+        autoClose: false,
+        closeOnClick: false,
+        className: 'running-popup',
+      })
+    )
+    .setPopupContent('Working')
+    .openPopup();
+});
