@@ -11,8 +11,115 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
-// Global Variables for access
-let map, mapEvent;
+// Creating App Class:
+class App {
+  // Creating Private Instance Properties
+  #map;
+  #mapEvent;
+  constructor() {
+    // Triggering the Geolocation API:
+    this._getPosition();
+
+    // 3 Adding event handler to the form when submitting
+    // - the enter key will be used for this
+    form.addEventListener('submit', this._newWorkout.bind(this));
+
+    // 8. Listening for the "change" event on the drop down menu:
+    inputType.addEventListener('change', this._toggleElevationField);
+  }
+
+  _getPosition() {
+    // Checking if browser supports the geolocation API:
+    if (navigator.geolocation) {
+      // Calling the geolocation API:
+      navigator.geolocation.getCurrentPosition(
+        // Call-back used if Geolocation Successful:
+        this._loadMap.bind(this),
+
+        // Call-back used if Geolocation Unsuccessful:
+        function () {
+          // Filler
+          alert('Could not get your position');
+        }
+      );
+    }
+  }
+
+  _loadMap(position) {
+    // Getting the coords from the position objects properties:
+    const { latitude } = position.coords;
+    const { longitude } = position.coords;
+
+    // Storing the position properties in an array
+    const coords = [latitude, longitude];
+
+    console.log(this);
+
+    // Created map object and stored results in the map varialbe:
+    // - Note that the 'map' variable is global
+    this.#map = L.map('map').setView(coords, 14);
+
+    // Creating and adding tile layer:
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.fr/hot/copyright">OpenStreetMap</a> contributors',
+    }).addTo(this.#map);
+
+    // Creating and adding initial marker on current position:
+    L.marker(coords)
+      .addTo(this.#map)
+      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+      .openPopup();
+
+    // Adding the leaflet event handler to the map object:
+    // - handling clicks on the map
+    this.#map.on('click', this._showForm.bind(this));
+  }
+
+  _showForm(mapE) {
+    // Assigning the global variable the value of the mapE:
+    this.#mapEvent = mapE;
+    // Render the form:
+    form.classList.remove('hidden');
+    // Focus on the Distance input field after form renders:
+    inputDistance.focus();
+  }
+
+  _toggleElevationField() {
+    // 9. Selecting which Elements should toggle the 'hidden' class:
+    inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+    inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+  }
+
+  _newWorkout(e) {
+    e.preventDefault();
+    // Clear input fields
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
+    // Display marker
+    const { lat, lng } = this.#mapEvent.latlng;
+    L.marker([lat, lng])
+      .addTo(this.#map)
+      .bindPopup(
+        // Setting pop up Propeprties
+        L.popup({
+          maxWidth: 250,
+          minWidth: 100,
+          autoClose: false,
+          closeOnClick: false,
+          className: 'running-popup',
+        })
+      )
+      .setPopupContent('Working')
+      .openPopup();
+  }
+}
+
+// Creating an instance of the 'App' Class:
+const app = new App();
 
 ///////////////////////////////////////////////////
 /*
@@ -246,75 +353,104 @@ if (navigator.geolocation) {
 
 // - in our html, the form has the class of "form" and "hidden", so we will be using DOM manipulation to add/remove the hidden class
 
-// Checking if browser supports the geolocation API
-if (navigator.geolocation) {
-  // Calling the geolocation API
-  navigator.geolocation.getCurrentPosition(
-    function (position) {
-      // Getting the coords from the position objects properties
-      const { latitude } = position.coords;
-      const { longitude } = position.coords;
+//
 
-      // Storing the position properties in an array
-      const coords = [latitude, longitude];
+// Checking if browser supports the geolocation API:
+// - some browsers don't support this API, so we have to check before trying to execute it
+// - we do this by wrapping the method in an if statement
+// - if it does not exist, the code will simply not run
 
-      // Created map object and stored results in the map varialbe
-      // - Note that the map variable is global
-      // - passed the coords and the zoom level to setView
-      map = L.map('map').setView(coords, 14);
+// Calling the geolocation API:
+// - we access the geolocation API through the 'navigator.geolocation.getCurrentPosition()' method
+// - this method takes two arguments
+// - the first argument is the call-back function that is called when the method is successful
+// - the second is the call-back function that is called when the method is unsuccessful
 
-      // Creating and adding tile layer
-      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.fr/hot/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+// Call-back used if Geolocation Successful:
+// - if succesful, an object called "position" will be generated and passed to the call-back function in the first argument before being executed
+// - this object contains a lot of data about the user's location
+// - as we know, the 'this' keyword of a function points to the object which called it
+// - we must explicitly bind the "this" keyword for this function call because it is actually being called by the Geolocation method, which is undefined
+// - so we have to use the bind method and pass it "this" as an argument
+// - remember that the bind method returns a new function, it doesn't call it
+// - this is why we can use it with a call-back function
+// - note that functions that use call-back functions as arguments require them to be passed as values, and not calls - they get called later
 
-      // Creating and adding initial marker on current position
-      L.marker(coords)
-        .addTo(map)
-        .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-        .openPopup();
+// Getting the coords from the position objects properties:
+// - the 'postiton' object contains a property called 'coords' which is an object containing a lot of data about the users location
+// - among the 'coords' object data are the 'latitude' and 'longitude' properties
+// - we can deconstruct this object and store the relevant properties in variables with the same names
+// - we can store these properties into an array, which makes them easier to pass to the methods that require an array as an argument
 
-      // Adding the leaflet event handler to the map object
-      // - handling clicks on map
-      map.on('click', function (mapE) {
-        // Assigning the global variable the value of the mapE
-        // - this is so we can access the event elsewhere
-        mapEvent = mapE;
+// Created map object and stored results in the map varialbe:
+// - we use the methods from the 'L' namespace in order to create a map
+// - this namespace uses two methods to do this: '.map' and '.setView';
 
-        // Render the form
-        form.classList.remove('hidden');
+//    ->'.map':
+//    --> can take an element's id as an argument
+//    --> we pass it an element id that belongs to an empty element in which we plan on displaying the map
+//    --> note that it only seems to work if that element's id is 'map'
+//    --> will return an object containing the maps default values(how exactly, idk)
 
-        // Focus on the Distance input field after form renders
-        inputDistance.focus();
-      });
-    },
-    function () {
-      alert('Could not get your position');
-    }
-  );
-}
+//    ->'.setView':
+//    --> takes 2 arguements: an array of coordinates containg lat and long values, and a zoom levek
+//    --> will set the map to center on the coordinates we pass as an argument, and set the zoom level as specified
+//    --> will return an object containing the maps new values
 
-// Adding event handler to the form when submitting
-// - the enter key will be used for this
-form.addEventListener('submit', function (e) {
-  e.preventDefault();
+// - these methods chained generate a map and return an object with the map's data
+// - we have a global varable called 'map' which we will use to store the object returned
 
-  // Display marker
-  console.log(mapEvent);
-  const { lat, lng } = mapEvent.latlng;
-  L.marker([lat, lng])
-    .addTo(map)
-    .bindPopup(
-      // Setting pop up Propeprties
-      L.popup({
-        maxWidth: 250,
-        minWidth: 100,
-        autoClose: false,
-        closeOnClick: false,
-        className: 'running-popup',
-      })
-    )
-    .setPopupContent('Working')
-    .openPopup();
-});
+// C. Creating and adding tile layer:
+// D. Creating and adding initial marker on current position:
+// E. Adding the leaflet event handler to the map object:
+// F. Assigning the global variable the value of the mapE:
+// G. Render the form:
+// H. Focus on the Distance input field after form renders:
+
+// ~~~~ Call-back used if Geolocation Unsuccessful ~~~~
+// J.
+
+// 8. Listening for the "change" event on the drop down menu:
+// - we want to add an event listener to the drop down menu, which is the 'select' element in our html
+// - note that when a value in a drop down menu changes, an "change" event happens
+// - we want certain elements to toggle their visibility when this change event fires
+
+// 9. Selecting which Elements should toggle the 'hidden' class:
+// - we know that we want to switch between the 'Elevation' input and the 'Cadenence' input being visible, only one or the other should be visible
+// - in order to do this, we need to toggle the hidden class on their parent element, aka the form row that contains them
+// - their parents don't really have unique names so we we do this through DOM traversing
+// - why their parents? Think of it this way, we don't just want to hide the input box, we want to hide the whole row of that input field on that form
+// - this is so the field we want to show can slide into its place fully instead of being awkwardly placed under the rest of the fields
+// - if we just hid the input fields, the row would still be there, taking up space and throwing off the design
+
+//
+
+// Project Architecture
+// ====================
+// - provides structure and organization to your project, in this structure, we can then develop functionality
+// - in this project, we decided that the main structure will come from classes and objects... aka oop
+// - one of the most important aspects of architecture is deciding where and how to store the data
+// /////////////////////////////////////////////////////////////////
+
+// Creating an instance of the 'App' Class:
+// - we need to create an instance  of our 'App' class in order to actually do anything
+// - without creating an instance, all we have is a blueprint
+// - as soon as the page loads, this instance should be created so that it's constructor function can execute
+// - this starts the process of our app
+// - we accomplish this by writing this code as the first line of code, after our variable and function definitions of course
+
+// Triggering the Geolocation API:
+// - note that all the code in the top level code, aka outside of any function, will get executed immediately as the script loads
+// - we want the geolocation API to be executed right at the point where the application loads, as the page is accessed
+// - to do this, we need to use the '_getPosition' method
+// - the constructor function of a class is called immediately when a new object is created from the class it belongs to
+// - the instance of the 'App' Class is created in the beggining, right as the page loads
+// - this means that the constructor method for that class is also executed immediatly as the page loads
+// - so what we can do is simply get the position in the constructor, using the corresponding method
+// - we access it using the 'this' keyword, since it is a method of the class
+
+// Creating Private Instance Properties
+// - the private instance properties will be available to all the instances created from the class they belong to
+// - we make the 'map' and the 'mapEvent' private instance properties
+// - we do this so the 'App' instance that is created as soon as the page loads has access to these properties
+// - we need this to be the case because so many of the methods it inherits from its class rely on these properties
