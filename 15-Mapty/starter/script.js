@@ -1,6 +1,8 @@
 'use strict';
 
 // prettier-ignore
+
+// Variable Declarations:
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 const form = document.querySelector('.form');
@@ -13,27 +15,27 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 // Creating App Class:
 class App {
-  // Creating Private Instance Properties
+  // Creating Private Instance Properties of the App Class
   #map;
   #mapEvent;
   constructor() {
-    // Triggering the Geolocation API:
+    // Getting the Location of the User:
     this._getPosition();
 
-    // 3 Adding event handler to the form when submitting
-    // - the enter key will be used for this
-    form.addEventListener('submit', this._newWorkout.bind(this));
-
-    // 8. Listening for the "change" event on the drop down menu:
+    // Listening for the "change" event on the drop down menu:
     inputType.addEventListener('change', this._toggleElevationField);
+
+    // Adding event handler to the form when submitting (enter-key)
+    form.addEventListener('submit', this._newWorkout.bind(this));
   }
 
+  // Private methods of the App Class
   _getPosition() {
     // Checking if browser supports the geolocation API:
     if (navigator.geolocation) {
-      // Calling the geolocation API:
+      // Calling the geolocation API to retrieve User Coordinates:
       navigator.geolocation.getCurrentPosition(
-        // Call-back used if Geolocation Successful:
+        // Call-back used if Geolocation Successful, Load Map:
         this._loadMap.bind(this),
 
         // Call-back used if Geolocation Unsuccessful:
@@ -50,13 +52,10 @@ class App {
     const { latitude } = position.coords;
     const { longitude } = position.coords;
 
-    // Storing the position properties in an array
+    // Storing the position properties in an array:
     const coords = [latitude, longitude];
 
-    console.log(this);
-
-    // Created map object and stored results in the map varialbe:
-    // - Note that the 'map' variable is global
+    // Created map object and stored results in the #map property:
     this.#map = L.map('map').setView(coords, 14);
 
     // Creating and adding tile layer:
@@ -65,19 +64,19 @@ class App {
         '&copy; <a href="https://www.openstreetmap.fr/hot/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    // Creating and adding initial marker on current position:
-    L.marker(coords)
-      .addTo(this.#map)
-      .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-      .openPopup();
+    // // Creating and adding initial marker on current position:
+    // L.marker(coords)
+    //   .addTo(this.#map)
+    //   .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+    //   .openPopup();
 
-    // Adding the leaflet event handler to the map object:
+    // Adding the leaflet event handler to the map object, Show Form:
     // - handling clicks on the map
     this.#map.on('click', this._showForm.bind(this));
   }
 
   _showForm(mapE) {
-    // Assigning the global variable the value of the mapE:
+    // Saving the click events coordinates in the #mapEvent property:
     this.#mapEvent = mapE;
     // Render the form:
     form.classList.remove('hidden');
@@ -92,6 +91,7 @@ class App {
   }
 
   _newWorkout(e) {
+    // Prevent the Default behavior of reloading the page:
     e.preventDefault();
     // Clear input fields
     inputDistance.value =
@@ -99,12 +99,12 @@ class App {
       inputCadence.value =
       inputElevation.value =
         '';
-    // Display marker
+    // Display marker:
     const { lat, lng } = this.#mapEvent.latlng;
     L.marker([lat, lng])
       .addTo(this.#map)
       .bindPopup(
-        // Setting pop up Propeprties
+        // Setting pop up Properties:
         L.popup({
           maxWidth: 250,
           minWidth: 100,
@@ -122,6 +122,184 @@ class App {
 const app = new App();
 
 ///////////////////////////////////////////////////
+
+// Overview:
+
+// Things we need to know:
+// - what events are we going to have?
+// - what do we want to happen when these events are triggered?
+// - how are we going to make that happen, and what architecture are we going to implement?
+
+// Events, in this order:
+// - page load event
+// - map click event
+// - form submit event
+// - 'select' element change event (drop down menu)
+
+// ---------------------
+// ---HANDLING EVENTS---
+// ---------------------
+
+// When the PAGE LOADS:
+// - we want the map to load in, and we want it to be centered on the users location
+
+// When the MAP is CLICKED:
+// - we want the form to be visible
+// - we want to store the coordinates of the location on that was clicked on the map
+// - these coordinates will be stored in the '#map' field, and will be used throughout the class
+
+// When the FORM is SUBMITTED:
+// - we want to add a marker to the map at the coordinates stored in the '#map' field
+
+//  When the value of the 'SELECT' element CHANGES:
+// - we want the 'elevation' and 'cadence' form rows to swap visibilities
+
+// ARCHITECTURE:
+// -------------
+// - we want to use OOP, meaning we will use classes and objects to organize and structure our code
+// - this means that we will be storing as much (if not all) of our data and methods inside of classes
+
+// - we will have a main class called 'App'
+// - this class will hold all the methods and data needed for handling events
+// - these methods will be executed by the instantiation of the main class
+// - the creation of the instance of the class will cause it's constructor function to execute, which we will take advantage of
+
+// - we will also have a class to store the workout data that we will get from user input
+// - this class will be a parent class to two other more specific workout classes: cycling and running
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Walk-through:
+
+// Variable Declarations:
+// - making it easier to work with the DOM and other relevant data by storing their value in more concise identifiers
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Creating App Class:
+// - this is the main class of the application
+// - we will store all of the data and methods used to handle events in this class
+// - these methods will be executed by the instantiation of the main class
+// - the creation of the instance of the class will cause it's constructor function to execute, which we will take advantage of
+
+// Creating Private Instance Properties of the App Class:
+// - we will add to these properties as needed
+// - that is usually when we realize that a piece of data needs to be used outside of the method that it was created in
+// - so far: #map, #mapEvent
+// ...
+// - the private instance properties will be available to all the instances created from the class they belong to
+// - we make the 'map' and the 'mapEvent' private instance properties
+// - we do this so the 'App' instance that is created as soon as the page loads has access to these properties
+// - we need this to be the case because so many of the methods it inherits from its class rely on these properties
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------
+// Constructor:
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Creating an instance of the 'App' Class:
+// - we need to create an instance  of our 'App' class in order to actually do anything
+// - without creating an instance, all we have is a blueprint
+// - as soon as the page loads, this instance should be created so that it's constructor function can execute
+// - this starts the process of our app
+// - we accomplish this by writing this code as the first line of code, after our variable and function definitions of course
+
+// Getting the Location of the User:
+// - note that all the code in the top level code, aka outside of any function, will get executed immediately as the script loads
+// - we want the geolocation API to be executed right at the point where the application loads, as the page is accessed
+// - to do this, we need to use the '_getPosition' method
+// - the constructor function of a class is called immediately when a new object is created from the class it belongs to
+// - the instance of the 'App' Class is created in the beginning, right as the page loads
+// - this means that the constructor method for that class is also executed immediately as the page loads
+// - so what we can do is simply get the position in the constructor, using the corresponding method
+// - we access it using the 'this' keyword, since it is a method of the class
+
+// Checking if browser supports the geolocation API:
+// - some browsers don't support this API, so we have to check before trying to execute it
+// - we do this by wrapping the method in an if statement
+// - if it does not exist, the code will simply not run
+
+// Calling the geolocation API to retrieve User Coordinates:
+// - we access the geolocation API through the 'navigator.geolocation.getCurrentPosition()' method
+// - this method takes two arguments
+// - the first argument is the call-back function that is called when the method is successful
+// - the second is the call-back function that is called when the method is unsuccessful
+
+// Call-back used if Geolocation Successful, Load Map:
+// - if successful, an object called "position" will be generated and passed to the call-back function in the first argument before being executed
+// - this object contains a lot of data about the user's location
+// - as we know, the 'this' keyword of a function points to the object which called it
+// - we must explicitly bind the "this" keyword for this function call because it is actually being called by the Geolocation method, which is undefined
+// - remember that the 'this' keyword of a call-back function is equal to the 'this' keyword of the higher-order function that is going to call it
+// - in this case, the Geolocation method is treated as a global function call for some reason, so it's 'this' keyword is undefined
+// - so we have to use the bind method and pass it "this" as an argument
+// - remember that the bind method returns a new function, it doesn't call it
+// - this is why we can use it with a call-back function
+// - note that functions that use call-back functions as arguments require them to be passed as values, and not calls - they get called later
+
+// Getting the coords from the 'position' objects properties:
+// - the 'position' object contains a property called 'coords' which is an object containing a lot of data about the users location
+// - among the 'coords' object data are the 'latitude' and 'longitude' properties
+// - we can deconstruct this object and store the relevant properties in variables with the same names
+// - we can store these properties into an array, which makes them easier to pass to the methods that require an array as an argument
+
+// Created map object and stored results in the #map property:
+// - we use the methods from the 'L' namespace in order to create a map
+// - this namespace uses two methods to do this: '.map' and '.setView';
+
+//    ->'.map':
+//    --> can take an element's id as an argument
+//    --> we pass it an element id that belongs to an empty element in which we plan on displaying the map
+//    --> note that it only seems to work if that element's id is 'map'
+//    --> will return an object containing the maps default values(how exactly, idk)
+
+//    ->'.setView':
+//    --> takes 2 arguments: an array of coordinates containing lat and long values, and a zoom level
+//    --> will set the map to center on the coordinates we pass as an argument, and set the zoom level as specified
+//    --> will return an object containing the maps new values
+
+// - these methods chained generate a map and return an object with the map's data
+// - we have a global variable called 'map' which we will use to store the object returned
+
+// Creating and adding tile layer:
+
+// Adding the leaflet event handler to the map object, Show Form:
+// Assigning the global variable the value of the mapE:
+// G. Render the form:
+// H. Focus on the Distance input field after form renders:
+
+// ~~~~ Call-back used if Geolocation Unsuccessful ~~~~
+// J.
+
+// 8. Listening for the "change" event on the drop down menu:
+// - we want to add an event listener to the drop down menu, which is the 'select' element in our html
+// - note that when a value in a drop down menu changes, an "change" event happens
+// - we want certain elements to toggle their visibility when this change event fires
+
+// 9. Selecting which Elements should toggle the 'hidden' class:
+// - we know that we want to switch between the 'Elevation' input and the 'Cadence' input being visible, only one or the other should be visible
+// - in order to do this, we need to toggle the hidden class on their parent element, aka the form row that contains them
+// - their parents don't really have unique names so we we do this through DOM traversing
+// - why their parents? Think of it this way, we don't just want to hide the input box, we want to hide the whole row of that input field on that form
+// - this is so the field we want to show can slide into its place fully instead of being awkwardly placed under the rest of the fields
+// - if we just hid the input fields, the row would still be there, taking up space and throwing off the design
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Project Architecture
+// ====================
+// - provides structure and organization to your project, in this structure, we can then develop functionality
+// - in this project, we decided that the main structure will come from classes and objects... aka oop
+// - one of the most important aspects of architecture is deciding where and how to store the data
+// /////////////////////////////////////////////////////////////////
+
+/*
+
+
+//////////////////////////////////////////////////////////////////////////
 /*
 
 // Geolocation API
@@ -129,7 +307,7 @@ const app = new App();
 // - is in fact a browser API just like internationalization, or timers... etc
 // - a very modern API, many modern APIs such as ones that can access a users camera or make a phone vibrate
 // - attempts to get the co-ordinates of the current position of the user
-// - this method takes two arguements as parameters
+// - this method takes two arguments as parameters
 
 // - the "getCurrentPosition" method takes two arguments:
 // a) the callback function that will be called on success
@@ -354,103 +532,3 @@ if (navigator.geolocation) {
 // - in our html, the form has the class of "form" and "hidden", so we will be using DOM manipulation to add/remove the hidden class
 
 //
-
-// Checking if browser supports the geolocation API:
-// - some browsers don't support this API, so we have to check before trying to execute it
-// - we do this by wrapping the method in an if statement
-// - if it does not exist, the code will simply not run
-
-// Calling the geolocation API:
-// - we access the geolocation API through the 'navigator.geolocation.getCurrentPosition()' method
-// - this method takes two arguments
-// - the first argument is the call-back function that is called when the method is successful
-// - the second is the call-back function that is called when the method is unsuccessful
-
-// Call-back used if Geolocation Successful:
-// - if succesful, an object called "position" will be generated and passed to the call-back function in the first argument before being executed
-// - this object contains a lot of data about the user's location
-// - as we know, the 'this' keyword of a function points to the object which called it
-// - we must explicitly bind the "this" keyword for this function call because it is actually being called by the Geolocation method, which is undefined
-// - so we have to use the bind method and pass it "this" as an argument
-// - remember that the bind method returns a new function, it doesn't call it
-// - this is why we can use it with a call-back function
-// - note that functions that use call-back functions as arguments require them to be passed as values, and not calls - they get called later
-
-// Getting the coords from the position objects properties:
-// - the 'postiton' object contains a property called 'coords' which is an object containing a lot of data about the users location
-// - among the 'coords' object data are the 'latitude' and 'longitude' properties
-// - we can deconstruct this object and store the relevant properties in variables with the same names
-// - we can store these properties into an array, which makes them easier to pass to the methods that require an array as an argument
-
-// Created map object and stored results in the map varialbe:
-// - we use the methods from the 'L' namespace in order to create a map
-// - this namespace uses two methods to do this: '.map' and '.setView';
-
-//    ->'.map':
-//    --> can take an element's id as an argument
-//    --> we pass it an element id that belongs to an empty element in which we plan on displaying the map
-//    --> note that it only seems to work if that element's id is 'map'
-//    --> will return an object containing the maps default values(how exactly, idk)
-
-//    ->'.setView':
-//    --> takes 2 arguements: an array of coordinates containg lat and long values, and a zoom levek
-//    --> will set the map to center on the coordinates we pass as an argument, and set the zoom level as specified
-//    --> will return an object containing the maps new values
-
-// - these methods chained generate a map and return an object with the map's data
-// - we have a global varable called 'map' which we will use to store the object returned
-
-// C. Creating and adding tile layer:
-// D. Creating and adding initial marker on current position:
-// E. Adding the leaflet event handler to the map object:
-// F. Assigning the global variable the value of the mapE:
-// G. Render the form:
-// H. Focus on the Distance input field after form renders:
-
-// ~~~~ Call-back used if Geolocation Unsuccessful ~~~~
-// J.
-
-// 8. Listening for the "change" event on the drop down menu:
-// - we want to add an event listener to the drop down menu, which is the 'select' element in our html
-// - note that when a value in a drop down menu changes, an "change" event happens
-// - we want certain elements to toggle their visibility when this change event fires
-
-// 9. Selecting which Elements should toggle the 'hidden' class:
-// - we know that we want to switch between the 'Elevation' input and the 'Cadenence' input being visible, only one or the other should be visible
-// - in order to do this, we need to toggle the hidden class on their parent element, aka the form row that contains them
-// - their parents don't really have unique names so we we do this through DOM traversing
-// - why their parents? Think of it this way, we don't just want to hide the input box, we want to hide the whole row of that input field on that form
-// - this is so the field we want to show can slide into its place fully instead of being awkwardly placed under the rest of the fields
-// - if we just hid the input fields, the row would still be there, taking up space and throwing off the design
-
-//
-
-// Project Architecture
-// ====================
-// - provides structure and organization to your project, in this structure, we can then develop functionality
-// - in this project, we decided that the main structure will come from classes and objects... aka oop
-// - one of the most important aspects of architecture is deciding where and how to store the data
-// /////////////////////////////////////////////////////////////////
-
-// Creating an instance of the 'App' Class:
-// - we need to create an instance  of our 'App' class in order to actually do anything
-// - without creating an instance, all we have is a blueprint
-// - as soon as the page loads, this instance should be created so that it's constructor function can execute
-// - this starts the process of our app
-// - we accomplish this by writing this code as the first line of code, after our variable and function definitions of course
-
-// Triggering the Geolocation API:
-// - note that all the code in the top level code, aka outside of any function, will get executed immediately as the script loads
-// - we want the geolocation API to be executed right at the point where the application loads, as the page is accessed
-// - to do this, we need to use the '_getPosition' method
-// - the constructor function of a class is called immediately when a new object is created from the class it belongs to
-// - the instance of the 'App' Class is created in the beggining, right as the page loads
-// - this means that the constructor method for that class is also executed immediatly as the page loads
-// - so what we can do is simply get the position in the constructor, using the corresponding method
-// - we access it using the 'this' keyword, since it is a method of the class
-
-// Creating Private Instance Properties
-// - the private instance properties will be available to all the instances created from the class they belong to
-// - we make the 'map' and the 'mapEvent' private instance properties
-// - we do this so the 'App' instance that is created as soon as the page loads has access to these properties
-// - we need this to be the case because so many of the methods it inherits from its class rely on these properties
