@@ -66,9 +66,6 @@ class Cycling extends Workout {
 // const run1 = new Running([39, -12], 5.2, 24, 178);
 // const cycling1 = new Cycling([39, -12], 27, 95, 523);
 
-// console.log(run1);
-// console.log(cycling1);
-
 ///////////////////////////////
 // APPLICATION ARCHITECTURE
 //////////////////////////////
@@ -93,6 +90,10 @@ class App {
     // Getting the Location of the User and loading the map:
     this._getPosition();
 
+    // Get data from local storage
+    this._getLocalStorage();
+
+    // --------- Event Handlers ----------
     // Listening for the "change" event on the drop down menu:
     inputType.addEventListener('change', this._toggleElevationField);
 
@@ -141,6 +142,11 @@ class App {
 
     // Adding the leaflet event handler to the map object, Show Form:
     this.#map.on('click', this._showForm.bind(this));
+
+    this.#workouts.forEach(work => {
+      // Rendering the markers of local storage data in a place we know the map has been loaded
+      this._renderWorkoutMarker(work);
+    });
   }
 
   _showForm(mapE) {
@@ -228,6 +234,9 @@ class App {
 
     // Hide form + Clear input fields
     this._hideForm();
+
+    // Set local storage to all workouts
+    this._setLocalStorage();
   }
 
   _renderWorkoutMarker(workout) {
@@ -306,7 +315,6 @@ class App {
   _moveToPopup(e) {
     // Looking with an element that either contains, or its parent contains, the specified class:
     const workoutEl = e.target.closest('.workout');
-    console.log(workoutEl);
 
     if (!workoutEl) return;
 
@@ -314,8 +322,6 @@ class App {
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
-
-    console.log(workout);
 
     this.#map.setView(workout.coords, this.#zoomLevel, {
       animate: true,
@@ -327,11 +333,68 @@ class App {
     // using the public interface
     workout.click();
   }
+
+  // Local storage is an API that the browser provides to us and that we can use
+  _setLocalStorage() {
+    // Calling the local storage API and setting a key value pair:
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+
+  // Getting data from the local storage through the API, using the previously defined key:
+  // - we do this with the '.getItem' method of the local storage API
+  // - we pass the key that we want stored data from
+  // - this will return the value in JSON string form, the same way it was stored in the setItem method
+  // - we can pass this method into the 'JSON.parse' method to turn it back into its orginal state, in this case it turns back into an array of objects
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+
+    //Checking if data exists
+    if (!data) return;
+
+    // If data exists, use it to restore app's 'workouts' array
+    this.#workouts = data;
+
+    this.#workouts.forEach(work => {
+      // Re-establishing Prototypal chain
+      // - when we get the data from the local storage and store it in its original state,
+      // - all the data of the objects are still there, but any inherited methods are not
+      // - it doesn't have the prototypal chain that we want it to have,  it loses it during the process
+      // - so we have to re-establish the chain ourself
+      // - this way, we give the workout objects access to all the inherited traits they had before
+      // - note that I'm not sure if these is an acceptable method of doing this, not sure if something gets broken doing it this way - but everything seems to be working fine after minimal testing
+      if (work.type === 'running') work.__proto__ = Running.prototype;
+
+      if (work.type === 'cycling') work.__proto__ = Cycling.prototype;
+
+      // Render the restored array of workouts in the sidebar
+      this._renderWorkout(work);
+
+      // Rendering Marker
+      // - will not work in this method since the method is executed immediately
+      // - note that getting the location of the user and loading the map can take some time
+      // - the rendering of the marker must happen after the map loads, cannot happen before
+      // - note that this function is executed right at the very beginning
+      // - so instead of trying to render the marker at the same time...
+      // - we should just move this logic to a place where we know for sure the map is loaded
+      // - that place in our code would be the end of the _loadMap method
+
+      // this._renderWorkoutMarker(work);
+    });
+  }
+
+  reset() {
+    // Removing the specified item from local storage
+    localStorage.removeItem('workouts');
+
+    // Reloading our page
+    location.reload();
+  }
 }
 
 // Creating an instance of the 'App' Class:
 const app = new App();
 
+// app end
 ///////////////////////////////////////////////////
 
 // Overview:
@@ -498,4 +561,15 @@ const app = new App();
 // - this is so the field we want to show can slide into its place fully instead of being awkwardly placed under the rest of the fields
 // - if we just hid the input fields, the row would still be there, taking up space and throwing off the design
 
+// Calling the local storage API:
+// - first argument is the key, second argument is a string value we want stored
+// - however, we want to store the workouts array.. which is an array of objects
+// - we can change any object into a string by using the 'JSON.stringify()' method
+// - we pass the object we want to turn into a string as an argument
+// - very simple API that is only advised to use with small amounts of data
+// - this is because local storage is 'blocking', which is very bad
+// - we will learn more about blocking in the future
+// - we can go to the 'Application' tab in our browser console and look under 'Local Storage' to view what we've stored
+
+// - the key we set can be used to retrieve the value we set in that key
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
