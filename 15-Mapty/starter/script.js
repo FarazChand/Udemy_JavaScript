@@ -1,7 +1,5 @@
 'use strict';
 
-// Variable Declarations:
-
 // Creating Workout Parent Class to store user input data:
 class Workout {
   // Getting current date:
@@ -9,6 +7,7 @@ class Workout {
   // Creating a unique ID:
   // - turns the current date into a string
   id = (Date.now() + '').slice(-10);
+  // Tracking the amount of clicks on the list item using an API:
   clicks = 0;
   constructor(coords, distance, duration) {
     // Storing common data from user input into object's properties:
@@ -64,8 +63,8 @@ class Cycling extends Workout {
   }
 }
 
-const run1 = new Running([39, -12], 5.2, 24, 178);
-const cycling1 = new Cycling([39, -12], 27, 95, 523);
+// const run1 = new Running([39, -12], 5.2, 24, 178);
+// const cycling1 = new Cycling([39, -12], 27, 95, 523);
 
 // console.log(run1);
 // console.log(cycling1);
@@ -74,6 +73,7 @@ const cycling1 = new Cycling([39, -12], 27, 95, 523);
 // APPLICATION ARCHITECTURE
 //////////////////////////////
 
+// Variable Declarations:
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
@@ -85,22 +85,22 @@ const inputElevation = document.querySelector('.form__input--elevation');
 // Creating App Class:
 class App {
   // Creating Private Instance Properties of the App Class
-  #map;
+  #map; // map object
   #zoomLevel = 13;
-  #mapEvent;
-  #workouts = [];
+  #mapEvent; // anytime map is clicked
+  #workouts = []; // array where workouts are stored after being instantiated
   constructor() {
-    // Getting the Location of the User:
+    // Getting the Location of the User and loading the map:
     this._getPosition();
 
     // Listening for the "change" event on the drop down menu:
     inputType.addEventListener('change', this._toggleElevationField);
 
-    // Adding event handler to the form when submitting (enter-key)
+    // Adding event handler to the form when submitting (enter-key):
     form.addEventListener('submit', this._newWorkout.bind(this));
 
-    // Adding an event handler to the parent of our list items, since the items don't exist:
-    // - moves map to list items coordinates
+    // Adding an event handler to the parent of our list items, since the items don't exist yet:
+    // - moves map to list item's coordinates
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
@@ -161,9 +161,9 @@ class App {
         '';
 
     // Hide the form
-    form.style.display = 'none';
-    form.classList.add('hidden');
-    setTimeout(() => (form.style.display = 'grid'), 1000);
+    form.style.display = 'none'; // immediately removes form from UI, hidden at his point
+    form.classList.add('hidden'); // adds the hidden class, transitions off page while hidden, can't see this transition which is what we want
+    setTimeout(() => (form.style.display = 'grid'), 1000); // changes display back to grid so that it can be visble again when we decide to toggle the hidden class again
   }
 
   _toggleElevationField() {
