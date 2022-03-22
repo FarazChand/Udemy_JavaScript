@@ -91,18 +91,6 @@ a:visited {
   grid-column: 1 / -1;
 }
 
-/* Extra */
-.list-btns {
-  font-size: 1.3rem;
-  border: 2px solid black;
-  position: absolute;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  grid-column: 1 / -1;
-}
-
 .workout__details {
   display: flex;
   align-items: baseline;

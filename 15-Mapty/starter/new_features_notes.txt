@@ -1,0 +1,36 @@
+Edit a workout:
+
+Remove a workout:
+
+*Adding a 'select' box to list items:
+- on all workouts, there will be a box that the user can click to select a workout
+- when selected, these boxes will have a different appearence, might do this on hover as well
+- a user will be able to select multiple workouts, and deselect workouts as they please
+- going to experiment with making it have the same color as its type value (left border, marker)
+
+
++HTML:
+-> note that I am attempting to leave room for an edit button in the future
+-> I will probably put the edit button and this select button in the same div, then put that div beside the title element of the list item
+-> I want the check to be to either the left or right of the title, need to experiment, but definetly on the same horizontal axis
+-> Because the original html for the list used grid, it will be innefficient to change all the code to include the box in the grid
+-> Instead, I will absolutely position the box in the top right corner
+-> Edit: I think we'll be replacing the title element with a div that contains the title AND this new element that contains our buttons
+-> we'll then make this div span accross the whole row of the grid, and use flex box to space it out the way we want to
+
+
+
++Functionality:
+-> I need to add a property to all list items that keeps track of whether an item has been selected or not
+-> the default value will be set to not selected (false)
+-> since I want this to be added to all list items, aka all workouts, I need to add the property to the parent Workout class
+-> when the relevent element is clicked, this value will change to true (selcted)
+
+
+*Delete Button:
+- there will be a red button at the top of the side bar, below the title but above the form
+- when this button is pressed, all selected elements will be deleted, and the local data will be updated
+- this button will appear after at least one list item has been added
+
+
+
