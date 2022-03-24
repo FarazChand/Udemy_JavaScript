@@ -4,6 +4,7 @@ const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 
 //////////////////////////////////////////////////
+/*
 
 // Creating a function that generates a card to our page with the information of the country that we specify
 const getCountryData = function (country) {
@@ -56,6 +57,8 @@ const getCountryData = function (country) {
 // - this means that returning data actually comes back in a random order, making it sometimes appear in a different order on the page
 // - if we wanted a predefined order, we would have to chain the requests
 // - this means making the second request only after the first request is finished
+// - these functions are basically running in parallel
+// - we cannot control which one finishes first
 getCountryData('portugal');
 getCountryData('tanzania');
 getCountryData('canada');
@@ -87,6 +90,7 @@ getCountryData('canada');
 // - this is because of how the JSON was formatted, we can simply destructure this
 // - by doing so, we will be dealing with a single obeject with all the data sent back from the request
 
+*/
 //////////////////////////////////////////////////
 
 // Asynchronous JS:
@@ -191,20 +195,20 @@ getCountryData('canada');
 
 // TCP: the transmission control protocol
 // IP: the internet protocol
-// - together, they are communication protocols that define exactly how data travels accross the web
+// - together, they are communication protocols that define exactly how data travels across the web
 // - they are basically the internets fundamental control system
 // - this is because they are the ones that set the rules on how data moves on the internet
 
-// - now its time to finaly make our request
+// - now its time to finalLy make our request
 // - the request we make is a http protocol
 // - http stands for 'hyper text transfer protocol'
 // - after tcp/ip, http is another communication protocol
 // - a communication protocol is simply a system of rules that allows two or more parties to communicate
-// - in the case of 'http', it's just a protocol that allows that allows clients and webservers to communicate
+// - in the case of 'http', it's just a protocol that allows that allows clients and web servers to communicate
 // - this works by sending request and response messages from clients to server an back
 
 // LOOK AT VIDEO TO SEE EXAMPLE OF AN HTTP REQUEST
-// - the beginning of an http request is called a 'start line', which contains the http method that is used in the request, then the request target, and alos the http version
+// - the beginning of an http request is called a 'start line', which contains the http method that is used in the request, then the request target, and also the http version
 // - there are many http methods available - but the most important ones are GET, POST, PUT and PATCH
 // - GET simply requests data
 // - POST sends data
@@ -213,9 +217,9 @@ getCountryData('canada');
 // - the request target is where the server is told that we want to access the specified resource (from the URL)
 // - if the target is empty, we would just be accessing the websites root
 
-// - the next part of the request are the request headers (many different possiblities)
+// - the next part of the request are the request headers (many different possibilities)
 // - which is just some information that we send about the request itself
-// - there are tons of standered different headers
+// - there are tons of standard different headers
 
 // - in the case that we are sending data to a server, there will also be a request body
 // - this body will contain the data that we are sending, for example, coming from an HTML form
@@ -253,3 +257,244 @@ getCountryData('canada');
 
 // - the job of the IP protocol is to actually send and route these packets through the internet
 // - it ensures that they arrive at the destination they should go by using IP addresses on each packet
+
+/////////////////////////////////////////
+/*
+
+// Welcome to Callback Hell
+
+const renderCountry = function (data, className = '') {
+  // Creating some content using the newly received data:
+  const html = `
+      <article class="country ${className}">
+      <img class="country__img" src="${data.flags.png}" />
+      <div class="country__data">
+      <h3 class="country__name">${data.name.official}</h3>
+      <h4 class="country__region">${data.region}</h4>
+      <p class="country__row"><span>👫</span>${(
+        +data.population / 1000000
+      ).toFixed(1)}m people</p>
+        <p class="country__row"><span>🗣️</span>${
+          Object.entries(data.languages)[0][1]
+        }</p>
+        <p class="country__row"><span>💰</span>${
+          Object.entries(data.currencies)[0][1].name
+        }</p>
+        </div>
+        </article>
+        `;
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+
+// Creating a function that generates a card to our page with the information of the country that we specify
+const getCountryAndNeighbor = function (country) {
+  // Ajax call country1
+  const request = new XMLHttpRequest();
+  request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
+  request.send();
+
+  // Using an event listener to listen for the load event emitted by the Send request:
+  request.addEventListener('load', function () {
+    // Data that is sent back:
+    console.log(this.responseText);
+    // Turning JSON into an OBJECT:
+    const [data] = JSON.parse(this.responseText);
+    // Console logging the new object, makes it easier to look at the structure:
+    console.log(data);
+
+    // Render Country 1
+    renderCountry(data);
+
+    // Get neighbor CountryL Happens after Country 1 completes:
+    // - in other words, it depends on the first country to finish loading before it can start
+    const [neighbour] = data.borders;
+
+    if (!neighbour) return;
+
+    // Ajax call country2
+    const request2 = new XMLHttpRequest();
+    request2.open('GET', `https://restcountries.com/v3.1/alpha/${neighbour}`);
+    request2.send();
+
+    request2.addEventListener('load', function () {
+      // - note that we are now using the country code instead of the country name
+      // - this means that we are getting data from a different URL
+      // - we have to check that we are still receiving information in the same format and not assume that it is the same
+      // - in this case, it is - but if for some reason the creator of this API made it so you received only an object for codes, we not have to destructure the JSON object...
+      const [data2] = JSON.parse(this.responseText);
+      console.log(data2);
+      renderCountry(data2, 'neighbour');
+    });
+  });
+};
+
+getCountryAndNeighbor('Usa');
+
+// - Here we have nested call backs
+// -If we wanted to keep getting neighbouring countries, we would have to keep nesting call-backs
+// - We have a name for these type of situations, it's called "Call-Back Hell"
+
+// - Call-back Hell is when we have a lot of nested call-backs in order to execute asynchronous tasks in sequence
+// - this happens to all asynchronous tasks which are handled by call-backs, and not just AJAX calls
+
+setTimeout(() => {
+  console.log('1 second passed');
+  setTimeout(() => {
+    console.log('2 second passed');
+    setTimeout(() => {
+      console.log('3 second passed');
+      setTimeout(() => {
+        console.log('4 second passed');
+      }, 1000);
+    }, 1000);
+  }, 1000);
+}, 1000);
+
+// - this triangular shape caused by indentation is a clear indication of call-back hell
+// - makes our code really messy
+// - makes our code very hard to understand and reason about
+// - this means our code will have more bugs and is just generally worse code
+
+// - fortunately for us, since ES6, there is a way of escaping call-back hell by using something called 'promises'
+
+*/
+/////////////////////////////////////////
+/*
+
+// Promises and the Fetch API
+
+// // Old-school: XML http request function:
+// const request = new XMLHttpRequest();
+// // Sending a GET request, seems like you have to set this up first
+// request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
+// // Sending request, fetches data in the background, emits a load event when finished:
+// request.send();
+
+// Modern AJAX calls:
+// ==================
+
+// Using the fetch function:
+const request = fetch(`https://restcountries.com/v3.1/name/${'canada'}`);
+// Promise is returned from the fetch function:
+console.log(request);
+
+// Modern AJAX calls:
+// ==================
+
+// Using the fetch function:
+// - there are actually more options that we can specify if we'd like
+// - these are for more complex AJAX calls, which can take an object of options
+// - for a simple GET request like this one, all we really need is to pass in the URL
+
+// Promise is returned from the fetch function:
+// - so we started the request, stored the result into a variable and logged that variable to the console
+// - we immediately got the promise, which is store in the request variable
+
+// What is a Promise?
+// ==================
+// - an object that is used as a placeholder for the future result of an asynchronous operation
+// - its like a container for an asynchronously delivered value
+// - less formal, a container for a future value, for example, a response coming from an AJAX call
+
+// - when we start the AJAX call, there is no value yet, but we know there will be some value in the future
+// - we can use a promise to handle this future value
+// - the advantage of promises is that we no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results
+// - we can also chain promises for a sequence of asynchronous operations
+// - this means no more nesting callbacks.. no more callback hell!
+
+// - since promises work with asynchronous operations, they are time sensitive.. they change over time
+// - this means that promises can be in different states
+// - this is what we call the lifecycle of a promise
+
+// Pending:
+// - at the start, we say that a promise is 'pending'
+// - this is before any value resulting from the asynchronous task is available
+// - during this time, the asynchronous task is still doing its work in the background
+
+// Settled:
+// - then, once the asynchronous task has finished, we say that the promise has 'settled'
+// - there are two different types of settled promises: fulfilled promises and rejected promises
+// - fulfilled: a promise that has successfully resulted in a value, as we expected
+// - rejected: there has been an error during the asynchronous task
+
+// - we are able to handle these different states in our code
+// - we can use them to do something as a result of either a successful promise or a rejected one
+
+// - another important thing about promises is that a promise is only settled once
+// - from there, the state will remain unchanged forever
+// - it's either fulfilled or rejected, but its impossible to change that state
+
+// Consume:
+// - these states are relevant and useful when we use a promise to get a result, which is called to consume a promise
+// - we consume a promise when we already have a promise, e.g. a promise returned from a fetch function
+// - in order for a promise to exist in the first place, it must first be built
+// - in the case of the fetch API, it's the fetch function that builds the promise amd return it for us to consume
+// - in this case we don't have to build the promise ourselves in order to consume it
+
+// - most of the time we will actually just consume promises, which is also the easier and more useful part
+// - but sometimes, we also have to build a promise, and not just consume it
+
+*/
+/////////////////////////////////////////
+
+// Consuming Promises:
+
+const renderCountry = function (data, className = '') {
+  // Creating some content using the newly received data:
+  const html = `
+      <article class="country ${className}">
+      <img class="country__img" src="${data.flags.png}" />
+      <div class="country__data">
+      <h3 class="country__name">${data.name.official}</h3>
+      <h4 class="country__region">${data.region}</h4>
+      <p class="country__row"><span>👫</span>${(
+        +data.population / 1000000
+      ).toFixed(1)}m people</p>
+        <p class="country__row"><span>🗣️</span>${
+          Object.entries(data.languages)[0][1]
+        }</p>
+        <p class="country__row"><span>💰</span>${
+          Object.entries(data.currencies)[0][1].name
+        }</p>
+        </div>
+        </article>
+        `;
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+
+// Modern AJAX calls:
+// ==================
+
+// // Old-school: XML http request function:
+// const request = new XMLHttpRequest();
+// request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
+// request.send();
+
+// Modern AJAX calls:
+// ==================
+
+// Using the fetch function:
+const request = fetch(`https://restcountries.com/v3.1/name/${'canada'}`);
+// Promise is returned from the fetch function:
+console.log(request);
+
+const getCountryData = function (country) {
+  // Calling the fetch function, which immediately returns a promise:
+  fetch(`https://restcountries.com/v3.1/name/${country}`).then(function (
+    response
+  ) {});
+};
+
+// Calling the fetch function, which immediately returns a promise:
+// - in the beginning, the promise is still pending
+// - eventually, the promise will be settled in either a fulfilled or rejected state
+// - for this example, we will assume that it is fulfilled
+
+// Calling the then method:
+// - on all promises, we can call the 'then' method
+// - into the then method, we need to pass a callback function that we want to be executed as soon as the promise is fulfilled - as soon as the result is available
+// - this callback function will actually receive one argument when it is called by JS
+// - this argument is the resulting value of the fulfilled promise
+// - we're calling it 'response' because it is the response of an AJAX call in this case
