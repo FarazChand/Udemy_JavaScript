@@ -3,6 +3,35 @@
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText('beforeend', msg);
+  // countriesContainer.style.opacity = 1;
+};
+
+const renderCountry = function (data, className = '') {
+  // Creating some content using the newly received data:
+  const html = `
+      <article class="country ${className}">
+      <img class="country__img" src="${data.flags.png}" />
+      <div class="country__data">
+      <h3 class="country__name">${data.name.official}</h3>
+      <h4 class="country__region">${data.region}</h4>
+      <p class="country__row"><span>👫</span>${(
+        +data.population / 1000000
+      ).toFixed(1)}m people</p>
+        <p class="country__row"><span>🗣️</span>${
+          Object.entries(data.languages)[0][1]
+        }</p>
+        <p class="country__row"><span>💰</span>${
+          Object.entries(data.currencies)[0][1].name
+        }</p>
+        </div>
+        </article>
+        `;
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  // countriesContainer.style.opacity = 1;
+};
+
 //////////////////////////////////////////////////
 /*
 
@@ -440,30 +469,6 @@ console.log(request);
 
 // Consuming Promises:
 
-const renderCountry = function (data, className = '') {
-  // Creating some content using the newly received data:
-  const html = `
-      <article class="country ${className}">
-      <img class="country__img" src="${data.flags.png}" />
-      <div class="country__data">
-      <h3 class="country__name">${data.name.official}</h3>
-      <h4 class="country__region">${data.region}</h4>
-      <p class="country__row"><span>👫</span>${(
-        +data.population / 1000000
-      ).toFixed(1)}m people</p>
-        <p class="country__row"><span>🗣️</span>${
-          Object.entries(data.languages)[0][1]
-        }</p>
-        <p class="country__row"><span>💰</span>${
-          Object.entries(data.currencies)[0][1].name
-        }</p>
-        </div>
-        </article>
-        `;
-  countriesContainer.insertAdjacentHTML('beforeend', html);
-  countriesContainer.style.opacity = 1;
-};
-
 // Modern AJAX calls:
 // ==================
 
@@ -482,10 +487,32 @@ console.log(request);
 
 const getCountryData = function (country) {
   // Calling the fetch function, which immediately returns a promise:
-  fetch(`https://restcountries.com/v3.1/name/${country}`).then(function (
-    response
-  ) {});
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then(function (response) {
+      // Looking at the response, which is what the promise passes once fulfilled:
+      console.log(response);
+      // Calling the json method on the response, creating a promise and returning it:
+      return response.json();
+    })
+    // Calling .then on the newly returned promise from the json method:
+    .then(function (data) {
+      // Looking at the response object:
+      console.log(data);
+      // Passing the data to our function in order to render the card:
+      renderCountry(data[0]);
+    });
 };
+
+// Function without comments, console logs, and with arrow functions
+const getCountryDataClean = function (country) {
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then(response => response.json())
+    .then(data => renderCountry(data[0]));
+};
+
+// Uncomment to see results:
+// getCountryData('portugal');
+// getCountryDataClean('portugal');
 
 // Calling the fetch function, which immediately returns a promise:
 // - in the beginning, the promise is still pending
@@ -498,3 +525,266 @@ const getCountryData = function (country) {
 // - this callback function will actually receive one argument when it is called by JS
 // - this argument is the resulting value of the fulfilled promise
 // - we're calling it 'response' because it is the response of an AJAX call in this case
+// - it is actually an object
+
+// Looking at the response, which is what the promise passes once fulfilled:
+// - notice that this response contains properties that look extremely similar to an http request... e.g. status code, headers
+// - the body property is the property that contains the data we are after
+// - also note that the 'body' property contains a value of 'Readable Stream' that we can't really look at or get any real information from
+
+// Calling the json method on the response, creating a promise and returning it:
+// - in order to read that data contained in the body,  we need to call the '.json' method on the response
+// -'.json' is a method that is available on all response objects of the fetch function, aka all of the resolved values of the fetch function
+// - the problem here is that this json method itself is actually also an asynchronous function
+// - this means that it will also return a new promise
+// - we don't know why it was implemented this way, this is just how it works
+// - we want to continue to work with the value that this promise produces once fulfilled, so we return it
+
+// Calling .then on the newly returned promise from the json method:
+// - since we returned the promise from the json method, we can now call the .then method on it as well
+// - once again, the .then method takes a call-back function which in this case receives the resolved value from the promise it is called on as an argument
+// - we will be calling this argument 'data' in this example
+
+// Looking at the resolved value:
+// - if we log the resolved value to the console, we will see that we can now access the data we intended to
+// - what is returned in this case is an array with one index containing an object that contains all the data we are looking for
+
+// Passing the data to our function in order to render the card:
+// - we can just pass the first index of data since it is an array with one index, we just need the info from the object, not the whole array that contains the object
+
+//
+//
+// Overview:
+// - we create a function that takes an argument which represents the name of the country we want to get data from
+// - in the body of our function, the first thing we do is call the fetch function
+// - we pass the function the url where we want to get data from, and replace the relevant field with our country argument - accessing the url where the data we want is located
+// - this creates a promise, which starts as pending but ends up being fulfilled in this case
+// - one fulfilled, we then call a method on this promise(kind of like stringing methods here)
+// - the method we call is called the 'then' method, which all fulfilled promises have access to
+// - this method receives an argument that represents the response object of the promise made by the fetch function
+// - this allows us to work with this response object
+
+// - however, we cannot access the data directly from this object, we have to call the .json method on it in order to access the data
+// - the .json method is available on all the fulfilled promises - on their response objects
+// - the problem with this method is that it is also an asynchronous function, so it also creates a promise
+// - this means that we can call the .then method on it as well
+// - we do this to continue working with the chain of events
+
+//////////////////////////////////////////////
+
+// Chaining Promises:
+// - we actually already have a chain of promises because of the json function
+// - the two 'then' methods called in sequence are already a small chain
+// - we will now chain two sequential AJAX calls
+// - we already have the data about the country, we now want to get the data about the neighbouring country
+// - the second AJAX call depends on the first call, so they need to be done in sequence
+
+const getCountryAndNeighbor = function (country) {
+  // First AJAX call: Getting the data for the first country:
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    // Promise resolved, returned the response object - convert to usable data with '.json':
+    .then(response => response.json())
+    // Promise resolved, returned data we can use, chaining another '.this':
+    .then(data => {
+      console.log(data[0]);
+      // Rendering the card for the first country:
+      renderCountry(data[0]);
+      // Getting the country code for the second country:
+      const neighbour = data[0].borders[0];
+      // Gaurd clause for the case where there is no neighboring country:
+      if (!neighbour) return;
+
+      console.log(neighbour);
+      // Second AJAX call: Getting data for the neighbour country:
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+    })
+    // Promise resolved, returned response object - convert to usable data with '.json':
+    .then(response => response.json())
+    // Promise resolved, returned data we can use, using it to render neighbor card:
+    .then(data => renderCountry(data[0], 'neighbour'));
+};
+
+// Cleaned up version:
+const getCountryAndNeighborClean = function (country) {
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then(response => response.json())
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbour = data[0].borders[0];
+
+      if (!neighbour) return;
+
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+    })
+    .then(response => response.json())
+    .then(data => renderCountry(data[0], 'neighbour'));
+};
+
+// Uncomment to see results:
+// getCountryAndNeighbor('canada');
+// getCountryAndNeighborClean('canada');
+
+//
+
+// In the last lecture, Jonas actually over simplified how things really work
+// - the 'then' method always returns a promise no matter if we actually return anything or not
+// - but if we do return a value, then that value will become the 'fulfillment value' of the returned promise
+// - all promises have a 'then' method which we can use to handle the promise once it has been fulfilled
+// - so the data that we receive as an argument of our 'then' method will be the fulfillment value of the promise that we are handling aka the promise we called the method on
+// - while using the 'then' method on a promise, if we return another promise - for example, we return another fetch function call, then the fulfilled value of the NEXT 'then' method will be the fulfilled value of the returned promise.
+// - in other words, the returned promise will be fulfilled, and the fulfillment value that it produced will be used as the argument for the next 'this' method
+// - promises really allow us to handle these complex asynchronous operations with as many steps as we want
+// - promises still use callback, but we don't have to deal with callback hell, makes everything easy to understand and to read
+
+// First AJAX call: Getting the data for the first country:
+// - we use the URL that is specifically for country NAMES
+
+// Second AJAX call: Getting data for the neighbour country:
+// - we use the URL that is specifically for country CODES
+// - we return the promise (result of the fetch function)
+// - we do this so we can chain the 'this' method
+// - similar steps as before
+
+//
+
+// Overview:
+// - the fetch function creates a promise, this promise is returned
+// - the 'then' method is called on this promise only AFTER it has been fulfilled, aka after the asynchronous function finishes execution and a value is returned
+// - in other words, we are calling the 'then' method on the resolved value of the promise
+// - in this case, the promise returns a 'response object', which I assume has to do with an http request
+// - this is why when we define the callback function of the 'this' method, we name the argument 'response'
+// - but dont get confused, the argument is still the resolved value of the promise that the 'then' method has just been called on
+// - the 'then' keyword always returns a promise, whether we return anything or not
+// - if we do return a value, then that value will become the "fulfillment value" of the returned promise... aka it will become the resolved value
+// - so the 'then' method returns a promise whose resolved value equals what we return
+// - in this case, we return the response object of the previous promise, but after it has the 'json' method called on it
+// - the 'json' method is also asynchronous, which means it will create a promise as well
+// - just remember that we are returning the result of this, and that result will be the resolved value of the 'then' method
+// - once the promise that the 'then' method returns has been fulfilled, we chain another 'then' method on it
+// - in this case, the promises's resolved value is the result of the previous promise after the 'json' method has been called on it, which produces the data we want
+// - this is why when we define the callback method of the 'this' method, we name the argument 'data'
+// - we access the first index of this argument because of how it is stored(not explaining this right now)
+// - we use this data to render the country card
+// - we then use its border property to check if it has neighbors
+// - if it doesn't, the
+
+//////////////////////////////////////////////////
+
+// Handling Rejected Promises:
+// - remember that a promise in which an error happened is a rejected promise
+// - the only way a fetch promise rejects is when the user loses their internet connection
+// - that will be the error we are handling here
+// - we can simulate this by going into our browser console, going to the network tab and changing the speed to 'offline'
+// - we also need to add a button that will attempt the AJAX calls when pressed
+// - so what we do is allow the page to load, then change the speed to offline, then press the button
+
+// There are two of to handling rejections:
+//  We can pass a second callback function into the 'then' method:
+// - the first callback is always going to be called for the fulfilled method
+// - but we can also pass in a second callback which will be called when the promise is rejected
+// - this second callback will be called with an argument which is basically the error itself
+// - this will 'catch' the error, which is what we call it when we handle an error
+// - we would have to do this for every 'then' method... which sucks
+// - however, we can do this in a much cleaner and easier way
+// - we can actually chain a method at the very end of the chain called 'catch', and pass the callback to handle errors  as an argument
+// - this 'catch' method at the end of the chain will basically catch any errors that occur in any place in this whole promise chain, no matter where that is
+// - errors basically propagate down the chain until they are caught
+// - we only get the 'uncaught' error if the error is not caught anywhere
+// - we can handle this error by logging it to the console
+// - note that 'catch' itself also returns a promise, allowing us to chain the 'finally' method which we talk about further down
+
+// - usually, just logging the information to the console is not enough in a real application with a real UI
+// - so instead, we can also display an error message for the user to see
+// - in this case we will use the renderError function that we created earlier
+
+// Note:
+// - the error generated by the 'catch' method is actually a real JS object
+// - we can create errors in JS with a constructor, ex just like a map or a set
+// - any error in JS that was created like this contains the message property
+// - we can use this to only print the message of that error and not the whole object itself
+
+// There is one more method that is available on all methods: FINALLY:
+// - besides 'then' and 'catch', there is also the 'finally' method
+// - also takes a callback as an argument, this callback will be called ALWAYS, whether the whole chain was successful or if it fails
+// - this method is not always useful, but it can be sometimes
+// - we use this method for something that needs to happen no matter the result of the promise
+// - one example of that is to hide a loading spinner
+// - some applications show a spinner when an asynchronous operation starts, and then hide it once the operation completes
+// - this happens regardless of the operations success, which is a perfect situation to use the finally method
+// - in our case, we always need to change the container's opacity to visible so that we can render either the country or the error depending on the success of the operation
+
+//
+const getCountriesError = function (country) {
+  // Country 1
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then(response => response.json())
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbour = data[0].borders[0];
+
+      if (!neighbour) return;
+
+      // Country 2
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+    })
+    .then(response => response.json())
+    .then(data => renderCountry(data[0], 'neighbour'))
+    // Catching any possible errors in the chain, at the end of the chain:
+    .catch(err => {
+      // Printing error object to console:
+      console.error(`${err} 💩💩💩`);
+      // Printing error message to UI:
+      renderError(`Something went wrong 💩💩 ${err.message}. Try agiain!`);
+    })
+    // Rendering the container:
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
+};
+
+// Adding a button - when pressed, executes the function containing the AJAX calls
+btn.addEventListener('click', function () {
+  // Will cause an 'uncaught' error if internet connection fails
+  getCountriesError('canada');
+});
+
+//////////////////////////////////////////////////
+
+// Throwing Errors Manually
+// - when we input a nonsense value into our function, it inserts it into the URL that we pass to the fetch function
+// - during the fetch, there is a 404 error because our API cannot find a country with that name
+// - even though there was a obviously a big problem with this request, the fetch function still did not reject in this case
+
+// Taking a look at the response object:
+// - looking at the 'ok' property of this object, we can see that it is set to false
+// - the reason for that is the status code 404
+// - note: if the 'property' is true, it will have the status code of 200
+
+const getCountriesError2 = function (country) {
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then(response => {
+      // Taking a look at the response object:
+      console.log(response);
+      return response.json();
+    })
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbour = data[0].borders[0];
+
+      if (!neighbour) return;
+
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+    })
+    .then(response => response.json())
+    .then(data => renderCountry(data[0], 'neighbour'))
+    .catch(err => {
+      console.error(`${err} 💩💩💩`);
+      renderError(`Something went wrong 💩💩 ${err.message}. Try agiain!`);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
+};
+
+//  Produces 404 error
+getCountriesError2('aadfadgasdg');
