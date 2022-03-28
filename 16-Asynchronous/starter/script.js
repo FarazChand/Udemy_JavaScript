@@ -483,7 +483,7 @@ console.log(request);
 // Using the fetch function:
 const request = fetch(`https://restcountries.com/v3.1/name/${'canada'}`);
 // Promise is returned from the fetch function:
-console.log(request);
+// console.log(request);
 
 const getCountryData = function (country) {
   // Calling the fetch function, which immediately returns a promise:
@@ -670,6 +670,8 @@ const getCountryAndNeighborClean = function (country) {
 
 //////////////////////////////////////////////////
 
+// General:
+
 // Handling Rejected Promises:
 // - remember that a promise in which an error happened is a rejected promise
 // - the only way a fetch promise rejects is when the user loses their internet connection
@@ -678,7 +680,7 @@ const getCountryAndNeighborClean = function (country) {
 // - we also need to add a button that will attempt the AJAX calls when pressed
 // - so what we do is allow the page to load, then change the speed to offline, then press the button
 
-// There are two of to handling rejections:
+// There are two ways of handling rejections:
 //  We can pass a second callback function into the 'then' method:
 // - the first callback is always going to be called for the fulfilled method
 // - but we can also pass in a second callback which will be called when the promise is rejected
@@ -713,7 +715,7 @@ const getCountryAndNeighborClean = function (country) {
 // - this happens regardless of the operations success, which is a perfect situation to use the finally method
 // - in our case, we always need to change the container's opacity to visible so that we can render either the country or the error depending on the success of the operation
 
-//
+// Handling Rejected Promises:
 const getCountriesError = function (country) {
   // Country 1
   fetch(`https://restcountries.com/v3.1/name/${country}`)
@@ -736,7 +738,7 @@ const getCountriesError = function (country) {
       // Printing error message to UI:
       renderError(`Something went wrong 💩💩 ${err.message}. Try agiain!`);
     })
-    // Rendering the container:
+    // Rendering the container, regardless of success status:
     .finally(() => {
       countriesContainer.style.opacity = 1;
     });
@@ -748,6 +750,26 @@ btn.addEventListener('click', function () {
   getCountriesError('canada');
 });
 
+//Explaining comments:
+
+// Catching any possible errors in the chain, at the end of the chain:
+// - we use the 'catch' method at the end of the chain of promises to do this
+// - we pass a callback as an argument, which will be executed if there is an error in order to handle it
+// - the 'catch' method actually returns a promise as well
+
+// Printing error object to console:
+// - we can console.error a custom error message to make it easier for us to understand what went wrong
+
+// Printing error message to UI:
+// - we can also render an error in the UI to make things easier for the user to understand what went wrong
+
+// Rendering the container, regardless of success status:
+// - we can actually use the 'finally' method to handle certain situations regardless of the success status of the asynchronous operations
+// - in this case, we know that both the 'renderCountry' and the 'renderError' methods render a div within the 'contriesContainer' div
+// - this 'countiresContainer' div has its display set to none as default
+// - we know that whether the promise chain fulfills or rejects, we still need this container to be visible so that either our error message or country card appears
+// - so we use the 'finally' method to change the opacity of the container, regardless of the outcome
+
 //////////////////////////////////////////////////
 
 // Throwing Errors Manually
@@ -758,24 +780,52 @@ btn.addEventListener('click', function () {
 // Taking a look at the response object:
 // - looking at the 'ok' property of this object, we can see that it is set to false
 // - the reason for that is the status code 404
-// - note: if the 'property' is true, it will have the status code of 200
+// - note: if the 'property' is true, it will have the status code of 200, meaning the request went well
+// - we can use the fact that the response object has an 'ok' value that can be set to false - we use it to reject the promise ourselves manually
+// - we can do this by creating a new error a new error, yes - we can create errors lol
+// - we do this by using the constructor function 'error()', passing in a message that we want to be the error message
+
+// Checking if the 'ok' property of the response object is false:
+// - if it is false we throw an error
+// - we can also set the new error message
+// - we do this by using the constructor function 'error()', passing in a message that we want to be the error message
+// - then we use the throw keyword, which will immediately terminate the current function, just like return does
+// - the effect of creating and throwing an error in any 'then' method is that the promise will immediately reject
+// - in other words, the 'then' method that the error has been thrown in will return a rejected promise, which will propagate to the 'catch' handler
+// - note that the 'throw' keyword acts like a return keyword, ending the function but also returning the new error object
+// - this error method clearly reflects the actual problem
+// - this will also cause the 'catch' method to catch this error
 
 const getCountriesError2 = function (country) {
   fetch(`https://restcountries.com/v3.1/name/${country}`)
+    // Changed the implicit arrow function into an arrow function with a block:
     .then(response => {
-      // Taking a look at the response object:
+      // Taking a look at the response object from the fetch function:
       console.log(response);
+
+      // Checking if the 'ok' property of the response object is false:
+      // if (!response.ok)
+      // throw new Error(`Country not found (${response.status})`);
+
+      // Since we added the block back, we have to return the response explicitly
       return response.json();
     })
     .then(data => {
       renderCountry(data[0]);
-      const neighbour = data[0].borders[0];
+      // const neighbour = data[0].borders[0];
+      const neighbour = 'sdfsgsgs';
 
       if (!neighbour) return;
 
       return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
     })
-    .then(response => response.json())
+    .then(response => {
+      // Doing the same thing here, but this makes our code not DRY:
+      console.log(response);
+      if (!response.ok)
+        throw new Error(`Country not found (${response.status})`);
+      return response.json();
+    })
     .then(data => renderCountry(data[0], 'neighbour'))
     .catch(err => {
       console.error(`${err} 💩💩💩`);
@@ -786,5 +836,110 @@ const getCountriesError2 = function (country) {
     });
 };
 
-//  Produces 404 error
-getCountriesError2('aadfadgasdg');
+//  Produces 404 error during the fetch function, but doesn't catch it:
+// getCountriesError2('asdfasdfa'); //uncomment to first thrown error
+// getCountriesError2('canada'); //uncomment to test second thrown error
+
+//  Produces a 404 error during the fetch function , but doesn't catch it:
+// - this produces a weird error, telling us "cannot read property 'flag' of undefined" - this is the error that gets caught
+// - this happens because the API can't find a country that matches our input, so when it tries to access that property - obviously it doesn't exist
+// - this also means that the error is caught during the 'renderCountry' method's execution
+// - but that is not where the error actually originates, it's not the original cause of the problem, so this information is misleading
+// - this error doesn't really reflect the true error, which is simply that our API cannot find any country with the name we passed
+// - this is reflected with the status code of 404
+// - note that the fetch function only rejects when there is no internet connection
+// - with the 404 error, the fetch promise will still get fulfilled, which is why the error isn't caught at the fetch function - where it origiinated
+// - since there is no rejection, our catch function cannot pick up on this error
+// - in this case, we really want to tell the user that 'no country was found with this name' - which is the origin of the problem
+
+// - just to be clear, the 404 error still happens, what is important to note is that the 'catch' method doesn't catch it
+// - so what ever code we set up to deal with errors in the body of the 'catch' function simply won't run
+
+// Why do we handle errors?
+// - it's the only/best way we can produce an accurate error message in the UI for the user
+// - it's a bad practise to leave a rejected promise hanging around
+
+// Same idea but we are going to export the repetetive functionality into a helper function:
+// - this helper function will wrap up the fetch, the error handling, and also the conversion to JSON
+// - we do this because it is annoying to do all these steps every time
+// - so instead, we are going to encapsulate all of it into one nice function
+
+// New helper function to deal with the fetch function, turning the promise into JSON, and handling the event of an error in that process:
+const getJSON = function (url, errorMsg = 'Something went wrong..') {
+  // Returning the result of the chain
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+    return response.json();
+  });
+};
+
+const getCountriesError3 = function (country) {
+  getJSON(`https://restcountries.com/v3.1/name/${country}`, `Country not found`)
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbour = data[0].borders[0];
+      // const neighbour = 'sdfsgsgs';
+      // Throwing an error for the case where a country actually has no neighbours:
+      // - creates a custom message for this scenario that makes sense
+      if (!neighbour) throw new Error(`No neighbour found!`);
+
+      return getJSON(
+        `https://restcountries.com/v3.1/alpha/${neighbour}`,
+        'Country not found'
+      );
+    })
+    .then(data => renderCountry(data[0], 'neighbour'))
+    .catch(err => {
+      console.error(`${err} 💩💩💩`);
+      renderError(`Something went wrong 💩💩 ${err.message}. Try agiain!`);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
+};
+
+//  Produces 404 error during the fetch function, but doesn't catch it:
+// getCountriesError3('canada');
+// getCountriesError3('asdada');
+
+// NOTE!!!:!:!:!:
+// - the fetch function can only return a rejected promise if there is no internet connection
+// - that means that the only way a 'catch' method will catch an error from a fetch function is if the error is caused because of internet problems
+// - THE .THEN METHOD DOES NOT WORK THIS WAY
+// - the 'then' method will return a rejected promise if the function throws an error.. or if we explicitly return a rejected promise
+// - so if something goes wrong during the execution of the body of the 'then' methods call back function, a rejected promise will be returned and can be caught
+// - this explains the behaviour of our 2nd function example
+
+// Recap:
+// - when ever we want to create some error that we want handled in the catch handler, all we need to do is to throw and create a new error
+// - of course we can do that for multiple reasons
+// - above, we did it for the case where no neighbor can be found
+
+///////////////////////////////////////////////////////////////////////
+
+// Coding Challenge #1:
+
+const whereAmI = function (lat, lng) {
+  fetch(
+    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+  )
+    .then(response => {
+      console.log(response);
+      if (!response.ok)
+        throw new Error(`Something went wrong. (${response.status})`);
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+      console.log(`You are in ${data.city}, ${data.countryName}.`);
+      return getCountriesError3(data.countryName);
+    })
+    .catch(err => {
+      console.error(`${err} 😒`);
+    });
+};
+
+// whereAmI(9999999, 999999);
+whereAmI(52.508, 13.381);
+whereAmI(19.037, 72.873);
+whereAmI(-33.933, 18.474);
