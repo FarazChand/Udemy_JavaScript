@@ -935,11 +935,57 @@ const whereAmI = function (lat, lng) {
       return getCountriesError3(data.countryName);
     })
     .catch(err => {
-      console.error(`${err} 😒`);
+      console.error(`${err.message} 😒`);
     });
 };
 
 // whereAmI(9999999, 999999);
-whereAmI(52.508, 13.381);
-whereAmI(19.037, 72.873);
-whereAmI(-33.933, 18.474);
+// whereAmI(52.508, 13.381);
+// whereAmI(19.037, 72.873);
+// whereAmI(-33.933, 18.474);
+
+///////////////////////////////////////////////////////////////////////
+
+// Asychronous Behind the Scenes: The Event Loop:
+
+// JS RUntime Review:
+// - A JS runtime is basiacally a container that includes all the different pieces that are necessary to execute JS code
+// - the heart of every JS runtine is the engine
+// - the engine is where code is actually exececuted and where objects are stored in memory
+// - these two things happen in the call stack and in the heap
+// - JS has only one thread of execution, so it can only do one thing at a time
+// - there is absolutely no multi-tasking happening in JS itself
+// - other languages like Java can execute multiple pieces of code at the same time, but not JS
+// - next we have the WEB api's environment
+// - these are some api's provided to the engine, but are actually not part of the JS language itself
+// - these are thing's like the DOM, TIMERS, fetch API, etc
+// - next up is the call-back queue
+// - this is a data structure that holds all the ready to be executed call-back functions that are attached to some event that has occured
+// - finally, whenever the call stack is empty the event loop takes call backs from the callback queue and puts them in the callstack so they can be executed
+// - so the event loop is the essential piece that makes asynchronous behaviour possible in js
+// - it's the reason we can have a non-blocking concurrency model in JS
+// - a concurrency model is simply how a language handle multiple things at the same time
+
+// - how does this non-blocking concurrency actually work, and why is the event loop so important?
+
+// - focusing on the important parts of the runtime: the call stack, the event loop, the Web APIs and the callback queue
+// - A JS engine is built around the idea of a single thread, but if this is the case, how can non blocking code be executed in an asynchronous way?
+
+// - everything related to the DOM is not really part of JS, but of the Web APIs
+// - so it's in the web APIs environment where the asynchronous tasks related to the DOM will run
+// - e.g. Image loading, Timers, AJAX calls, and really all other asynchronous tasks
+// - these asynchronous tasks will all run in the web APIs environment of the browser
+// - in the case of an image loading, if we want to do something once the image is finishded loading, we have to listen for the 'load' event
+// - we do this by adding an event listener to the image element
+// - in practice, this means to register this call-back in the web APIs environment exactly where the image is loading
+// - the call back will stay there until the load event is emitted
+
+// - asynchronous tasks run in the background - the background being not the engine but the web api environment
+// - when a callback is assigned to one of these asychronous tasks, they are sent to the web api evironment with the task
+// - call-backs attached to asychronous tasks  will remain in the web api environment until the task finishes its process.
+// - once the task has finished, the callback is moved to the end of the callback queue
+// - the callback queue only starts executing the code it contains once the callstack is empty
+// - note that the callback queue also includes non-asynchronous dom events like clicks and key presses. They work pretty much the same way except that they don't have any asychronous process to wait for
+
+// - the event loop is actually what controls when the callback queue can start moving the stored call backs into the call stack
+// - The event loop looks into the callstack to see if it's empty, and if it is, it starts executing callback functions from the callback queue in the callstack
