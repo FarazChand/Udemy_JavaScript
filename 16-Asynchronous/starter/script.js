@@ -946,12 +946,12 @@ const whereAmI = function (lat, lng) {
 
 ///////////////////////////////////////////////////////////////////////
 
-// Asychronous Behind the Scenes: The Event Loop:
+// Asynchronous Behind the Scenes: The Event Loop:
 
 // JS RUntime Review:
-// - A JS runtime is basiacally a container that includes all the different pieces that are necessary to execute JS code
-// - the heart of every JS runtine is the engine
-// - the engine is where code is actually exececuted and where objects are stored in memory
+// - A JS runtime is basically a container that includes all the different pieces that are necessary to execute JS code
+// - the heart of every JS runtime is the engine
+// - the engine is where code is actually executed and where objects are stored in memory
 // - these two things happen in the call stack and in the heap
 // - JS has only one thread of execution, so it can only do one thing at a time
 // - there is absolutely no multi-tasking happening in JS itself
@@ -960,9 +960,9 @@ const whereAmI = function (lat, lng) {
 // - these are some api's provided to the engine, but are actually not part of the JS language itself
 // - these are thing's like the DOM, TIMERS, fetch API, etc
 // - next up is the call-back queue
-// - this is a data structure that holds all the ready to be executed call-back functions that are attached to some event that has occured
+// - this is a data structure that holds all the ready to be executed call-back functions that are attached to some event that has occurred
 // - finally, whenever the call stack is empty the event loop takes call backs from the callback queue and puts them in the callstack so they can be executed
-// - so the event loop is the essential piece that makes asynchronous behaviour possible in js
+// - so the event loop is the essential piece that makes asynchronous behavior possible in js
 // - it's the reason we can have a non-blocking concurrency model in JS
 // - a concurrency model is simply how a language handle multiple things at the same time
 
@@ -975,17 +975,49 @@ const whereAmI = function (lat, lng) {
 // - so it's in the web APIs environment where the asynchronous tasks related to the DOM will run
 // - e.g. Image loading, Timers, AJAX calls, and really all other asynchronous tasks
 // - these asynchronous tasks will all run in the web APIs environment of the browser
-// - in the case of an image loading, if we want to do something once the image is finishded loading, we have to listen for the 'load' event
+// - in the case of an image loading, if we want to do something once the image is finished loading, we have to listen for the 'load' event
 // - we do this by adding an event listener to the image element
 // - in practice, this means to register this call-back in the web APIs environment exactly where the image is loading
 // - the call back will stay there until the load event is emitted
 
 // - asynchronous tasks run in the background - the background being not the engine but the web api environment
-// - when a callback is assigned to one of these asychronous tasks, they are sent to the web api evironment with the task
-// - call-backs attached to asychronous tasks  will remain in the web api environment until the task finishes its process.
+// - when a callback is assigned to one of these asynchronous tasks, they are sent to the web api environment with the task
+// - call-backs attached to asynchronous tasks  will remain in the web api environment until the task finishes its process.
 // - once the task has finished, the callback is moved to the end of the callback queue
 // - the callback queue only starts executing the code it contains once the callstack is empty
-// - note that the callback queue also includes non-asynchronous dom events like clicks and key presses. They work pretty much the same way except that they don't have any asychronous process to wait for
+// - note that the callback queue also includes non-asynchronous dom events like clicks and key presses. They work pretty much the same way except that they don't have any asynchronous process to wait for
 
 // - the event loop is actually what controls when the callback queue can start moving the stored call backs into the call stack
 // - The event loop looks into the callstack to see if it's empty, and if it is, it starts executing callback functions from the callback queue in the callstack
+
+// Ex.
+const eventLoopTest = function () {
+  console.log('Test Start');
+  setTimeout(() => console.log('0 sec timer'), 0);
+  Promise.resolve('Resolved promise 1').then(res => console.log(res));
+  console.log('Test End');
+};
+
+// eventLoopTest(); // Uncomment to test
+
+// Test Start
+// Test End
+// Resolved promise 1
+// 0 sec timer
+
+// - top level code gets executed first
+// - both the setTimeout and promise are sent to their respective queues immediately (because we programmed it that way)
+// - micro-tasks take precedent over normal asynchronous tasks, which is why the promise is printed before the timer
+
+////////////////////////////////////////
+
+// Building a Simple Promise
+
+// Creating a promise:
+// - uses the 'new promise' constructor, stored in a variable of our choice
+// - passing it an 'executor' function as an argument, which executes as soon as the promise runs
+// - 'executor function takes two arguments; the 'resolve' and 'reject' functions
+
+const lotteryPromise = new Promise(function (resolve, reject) {});
+
+// Creating a promise using the 'new promise' constructor:
