@@ -1014,10 +1014,65 @@ const eventLoopTest = function () {
 // Building a Simple Promise
 
 // Creating a promise:
-// - uses the 'new promise' constructor, stored in a variable of our choice
-// - passing it an 'executor' function as an argument, which executes as soon as the promise runs
-// - 'executor function takes two arguments; the 'resolve' and 'reject' functions
+const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log('Lottery draw is happening');
+  // Setting timer to make this asynchronous:
+  setTimeout(function () {
+    // If true, we win the lottery
+    if (Math.random() >= 0.5) {
+      // If we win, fulfull the promise - using the resolve argument:
+      resolve('You WIN 💰');
+    } else {
+      // If we lose, reject the promise:
+      reject(new Error('You lost your money 💩'));
+    }
+  }, 2000);
+});
 
-const lotteryPromise = new Promise(function (resolve, reject) {});
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+
+// Promisifying:
+// - wrapping callback based functions into promises, in other words -
+// - converting callback based asynchronous behavior to promised based
 
 // Creating a promise using the 'new promise' constructor:
+// - uses the 'new promise' constructor, stored in a variable of our choice
+// - passing it an 'executor' function as an argument, which executes as soon as the promise runs
+// - 'executor' function takes two arguments; the 'resolve' and 'reject' functions
+// - the 'executor' function contains the promise's asycnchronous behavior that we are trying to handle with the promise
+// - it should eventually produce a resolved value, aka the future value of the promise
+
+// If we win, fulfull the promise - using the "resolve" argument:
+// - this resolve function marks this promise as fulfilled
+// - we pass the fulfilled value of the promise into to this function
+// - this allows it to be later consumed by the 'then' method
+
+// If we lose, reject the promise:
+// - calling the 'reject' function marks the promise as rejected
+// - this is the value that will be passed to the 'catch' method
+
+// Promisifying the setTimeout function:
+
+const wait = function (seconds) {
+  // Returning a promise:
+  // - don't need to pass a reject argument in this case
+  // - this is because it is impossible for a timer to fail
+  return new Promise(function (resolve) {
+    // Passing the resolve function to the timer:
+    // - all we want to happen at the end of the timer is for our promise to be resolved
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+// We want something to happen after a timer of 2 seconds:
+wait(2)
+  .then(() => {
+    // This is what we want to happen after the timer:
+    console.log('I waited for 2 seconds');
+    // We want something to happen after a timer of 1 second - in sequence of the first timer:
+    // - we must return the function - the function returns a promise which will be resolved
+    return wait(1);
+  })
+  // This is what we want to happen after the second timer:
+  // - takes the resolved value of the promise the last 'this' method returned
+  .then(() => console.log('I waited for 1 seconds'));
