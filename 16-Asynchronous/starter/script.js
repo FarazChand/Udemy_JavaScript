@@ -1178,3 +1178,20 @@ createImage('./img/img-1.jpg')
   })
   // Setting up a 'catch' method to catch any rejected promises:
   .catch(err => console.error(err));
+
+////////////////////////////////////////////////////
+
+// Consuming Promises with Async/Await
+// - since es2017, there is an even better and easier way to consume promises called 'Async/Await
+
+// Adding the 'async' keyword makes this function asychronous:
+const whereAmI = async function (country) {
+  // Inside an async function, we can have no or more 'await' statements:
+  // - needs a promise
+  // - this fetch function will return a promise
+  // - we use the await keyword to wait for the result of that promise
+  // - the await keyword stops the execution of the function until the promise is fulfilled
+  // - this is not a problem, since the function itself is executing asynchronously in the background
+  // - this doesn't block the main thread of execution
+  await fetch();
+};
