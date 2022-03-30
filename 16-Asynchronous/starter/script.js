@@ -916,6 +916,7 @@ const getCountriesError3 = function (country) {
 // - above, we did it for the case where no neighbor can be found
 
 ///////////////////////////////////////////////////////////////////////
+/*
 
 // Coding Challenge #1:
 
@@ -1076,3 +1077,91 @@ wait(2)
   // This is what we want to happen after the second timer:
   // - takes the resolved value of the promise the last 'this' method returned
   .then(() => console.log('I waited for 1 seconds'));
+
+  */
+// //////////////////////////////////////////////
+/*
+
+const getPosition = function () {
+  // This function returns a promise that we build using this executor function:
+  return new Promise(function (resolve, reject) {
+    // OKAY way of getting the geolocation to either resolve or reject:
+    // - returns the position if successful, error if failed
+
+    // navigator.geolocation.getCurrentPosition(
+    //   position => resolve(position),
+    //   err => reject(err)
+    // );
+
+    // Better way to resolve or reject this callback based function:
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+// Will console log the position object that is returned from 'getPosition':
+getPosition().then(pos => console.log(pos));
+
+// Better way to resolve or reject this callback based function:
+// - the first argument of the geolocation api always takes position object as an argument
+// - the second argument always takes the error object
+// - we instead pass the resolve and reject functions in their place
+// - this tells the function to either resolve if successful or reject if failed
+// - if it resolves, it automatically takes the position object as the fulfilled value of the promise
+// - if it rejects, it does the same but with the error object
+
+*/
+//////////////////////////////////////////////////////////////////
+
+//  Coding Challenge #2
+
+let imageContainer = document.querySelector('.images');
+let currentImg;
+
+const wait = function (seconds) {
+  // Returning a promise:
+  return new Promise(function (resolve) {
+    // Passing the resolve function to the timer:
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+const createImage = function (imgPath) {
+  // Returning Promise, allows chaining:
+  return new Promise(function (resolve, reject) {
+    // Creating new image and setting src:
+    const img = document.createElement('img');
+    img.src = imgPath;
+
+    // Listening for the image to successfully load:
+    img.addEventListener('load', function () {
+      // This code only executes upon success of loading:
+      imageContainer.append(img);
+      resolve(img);
+    });
+
+    // Listening if the image fails to load:
+    img.addEventListener('error', function () {
+      reject(new Error('Image not found'));
+    });
+  });
+};
+
+createImage('./img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    console.log('Image 1 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('./img/img-2.jpg');
+  })
+  .then(img => {
+    currentImg = img;
+    console.log('Image 2 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+  })
+  .catch(err => console.error(err));
