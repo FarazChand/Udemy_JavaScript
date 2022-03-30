@@ -1102,11 +1102,11 @@ const getPosition = function () {
 getPosition().then(pos => console.log(pos));
 
 // Better way to resolve or reject this callback based function:
-// - the first argument of the geolocation api always takes position object as an argument
-// - the second argument always takes the error object
-// - we instead pass the resolve and reject functions in their place
+// - the first argument of the geolocation api always takes position object as an argument for it's callback function
+// - the second argument always takes the error object for it's callback function
+// - we instead pass the resolve and reject functions as callbacks
 // - this tells the function to either resolve if successful or reject if failed
-// - if it resolves, it automatically takes the position object as the fulfilled value of the promise
+// - if it resolves, it automatically takes the position object as an argument, which in turn becomes the fulfilled value of the promise
 // - if it rejects, it does the same but with the error object
 
 */
@@ -1114,13 +1114,17 @@ getPosition().then(pos => console.log(pos));
 
 //  Coding Challenge #2
 
+// Selecting the container we want to add the image:
 let imageContainer = document.querySelector('.images');
+// Creating a global variable in which to store our current image:
+// - this is so we have access to it later on in order to hide the image
 let currentImg;
 
 const wait = function (seconds) {
-  // Returning a promise:
+  // Returning a promise, allows chaining and avoids callback hell:
   return new Promise(function (resolve) {
     // Passing the resolve function to the timer:
+    // - promise only executes the resolve function after the specified time has passed
     setTimeout(resolve, seconds * 1000);
   });
 };
@@ -1146,16 +1150,24 @@ const createImage = function (imgPath) {
   });
 };
 
+// Testing:
 createImage('./img/img-1.jpg')
+  // Consumes the promise returned from createImage and does something with the resolved value:
   .then(img => {
+    // Saves the value of the image to a global variable for future use:
     currentImg = img;
     console.log('Image 1 loaded');
+    // Waiting two seconds, also returning this function will return a promise, allowing further chaining:
     return wait(2);
   })
+  // Consumes the promise returned from the 'then' method and does something with it's resolved value:
   .then(() => {
+    // Accesses the current image through the global variable and hides it:
     currentImg.style.display = 'none';
+    // Returning this function because we want to implement its functionality AND allow it to continue to chain once it returns a promise:
     return createImage('./img/img-2.jpg');
   })
+  // Same process as above
   .then(img => {
     currentImg = img;
     console.log('Image 2 loaded');
@@ -1164,4 +1176,5 @@ createImage('./img/img-1.jpg')
   .then(() => {
     currentImg.style.display = 'none';
   })
+  // Setting up a 'catch' method to catch any rejected promises:
   .catch(err => console.error(err));
