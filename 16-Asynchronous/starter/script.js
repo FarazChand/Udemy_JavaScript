@@ -5,7 +5,7 @@ const countriesContainer = document.querySelector('.countries');
 
 const renderError = function (msg) {
   countriesContainer.insertAdjacentText('beforeend', msg);
-  // countriesContainer.style.opacity = 1;
+  countriesContainer.style.opacity = 1;
 };
 
 const renderCountry = function (data, className = '') {
@@ -29,7 +29,7 @@ const renderCountry = function (data, className = '') {
         </article>
         `;
   countriesContainer.insertAdjacentHTML('beforeend', html);
-  // countriesContainer.style.opacity = 1;
+  countriesContainer.style.opacity = 1;
 };
 
 //////////////////////////////////////////////////
@@ -466,6 +466,7 @@ console.log(request);
 
 */
 /////////////////////////////////////////
+/*
 
 // Consuming Promises:
 
@@ -570,7 +571,9 @@ const getCountryDataClean = function (country) {
 // - this means that we can call the .then method on it as well
 // - we do this to continue working with the chain of events
 
+*/
 //////////////////////////////////////////////
+/*
 
 // Chaining Promises:
 // - we actually already have a chain of promises because of the json function
@@ -668,7 +671,9 @@ const getCountryAndNeighborClean = function (country) {
 // - we then use its border property to check if it has neighbors
 // - if it doesn't, the
 
+*/
 //////////////////////////////////////////////////
+/*
 
 // General:
 
@@ -770,7 +775,9 @@ btn.addEventListener('click', function () {
 // - we know that whether the promise chain fulfills or rejects, we still need this container to be visible so that either our error message or country card appears
 // - so we use the 'finally' method to change the opacity of the container, regardless of the outcome
 
+*/
 //////////////////////////////////////////////////
+/*
 
 // Throwing Errors Manually
 // - when we input a nonsense value into our function, it inserts it into the URL that we pass to the fetch function
@@ -915,6 +922,7 @@ const getCountriesError3 = function (country) {
 // - of course we can do that for multiple reasons
 // - above, we did it for the case where no neighbor can be found
 
+*/
 ///////////////////////////////////////////////////////////////////////
 /*
 
@@ -922,7 +930,7 @@ const getCountriesError3 = function (country) {
 
 const whereAmI = function (lat, lng) {
   fetch(
-    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+    ``https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en``
   )
     .then(response => {
       console.log(response);
@@ -1111,6 +1119,7 @@ getPosition().then(pos => console.log(pos));
 
 */
 //////////////////////////////////////////////////////////////////
+/*
 
 //  Coding Challenge #2
 
@@ -1179,19 +1188,125 @@ createImage('./img/img-1.jpg')
   // Setting up a 'catch' method to catch any rejected promises:
   .catch(err => console.error(err));
 
+*/
 ////////////////////////////////////////////////////
 
-// Consuming Promises with Async/Await
+// Consuming Promises with Async/Await:
 // - since es2017, there is an even better and easier way to consume promises called 'Async/Await
 
-// Adding the 'async' keyword makes this function asychronous:
-const whereAmI = async function (country) {
-  // Inside an async function, we can have no or more 'await' statements:
-  // - needs a promise
-  // - this fetch function will return a promise
-  // - we use the await keyword to wait for the result of that promise
-  // - the await keyword stops the execution of the function until the promise is fulfilled
-  // - this is not a problem, since the function itself is executing asynchronously in the background
-  // - this doesn't block the main thread of execution
-  await fetch();
+// Error Handling with try...catch
+// - we can wrap our function's code in a try block
+// - we can then tell it what to do if an error happens using a catch block
+// - if no error happens, the code executes normally
+// - works very similarly to the catch method, receives the error object as an argument
+
+// fetch(`https://restcountries.com/v3.1/name/${country}`).then(res =>
+//   console.log(res)
+// ); // old way
+
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
 };
+
+// Adding the 'async' keyword makes this function asynchronous:
+const whereAmI = async function () {
+  // Wrapping code in a try block:
+  try {
+    // Geolocation:
+    const pos = await getPosition();
+    const { lattitude: lat, longitute: lng } = pos.coords;
+
+    // Reverse Geocodding
+    const resGeo = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+    );
+    // Handles any error in this fetch, makes any caught error contain a useful message:
+    if (!resGeo.ok) throw new Error('Problem getting location data');
+
+    const dataGeo = await resGeo.json();
+
+    // Country Data:
+    // Inside an async function, we can have one or more 'await' statements:
+    const res = await fetch(
+      `https://restcountries.com/v3.1/name/${dataGeo.countryName}`
+    );
+    // Handles any error in this fetch, makes any caught error contain a useful message:
+    if (!res.ok) throw new Error('Problem getting country data 💩');
+
+    // We can use another await to get the json from res:
+    const data = await res.json();
+    renderCountry(data[0]);
+    // Returning a value from an async function:
+    return `You are in ${data[0].name.common}`;
+
+    // Handling errors with a catch block:
+  } catch (err) {
+    // Console logging error for our use:
+    console.error(`${err}`);
+    // Rendering error to UI for the user:
+    renderError(`${err.message}`);
+    // Reject promise returned from async function:
+    throw err;
+  }
+};
+
+console.log('Getting location...');
+// whereAmI()
+//   .then(country => console.log(country))
+//   .catch(err => console.error(err.message))
+//   .finally(() => console.log('Finished getting location'));
+
+// Immediately invoking an async function expression:
+(async function () {
+  try {
+    console.log(await whereAmI());
+  } catch (err) {
+    console.error(`${err.message} ⛔`);
+  }
+  console.log('Finished getting location');
+})();
+
+// Inside an async function, we can have one or more 'await' statements:
+// - the await statements need a promise
+// - in this example, the fetch function will return a promise
+// - we use the await keyword to wait for the result of that promise
+// - the await keyword STOPS the execution of the function until the promise is resolved
+// - this is not a problem, since the function itself is executing asynchronously in the background
+// - this doesn't block the main thread of execution
+// - once the promise is resolved, the value of the whole await expression is going to be the resolved value of the promise
+// - we can store this value in a variable
+// - removes the need to use callback functions or consume promises with the then method
+// - important to note that async/await is simply syntactic sugar over promises and the then method
+
+// We can use another await to get the json from res:
+// - before we would have to return the promise this produces, followed by the use of the 'then' method in order to use the resolved value
+// - now we just store the resolved value in a variable and use the data right away
+
+// Creating a new error for fetch functions incase of failure:
+// - remember that fetch functions only reject when there is no internet connection
+// - this means when other errors arise, they don't get caught by the catch block, the promise still gets returned and is seen as resolved
+// - we create a new error if the response fails - this allows us to reject the promisea
+// - we do this because it allows us to more accurately deduce where the problem originated
+// - this also allows use to create descriptive error messages that help anyone debugging understand what the problem is, as well as being able to render the error to the user
+
+// Returning values from Async functions:
+// - the value that we return from an async function will become the fulfilled value of the promise that is returned by the function
+// - we return this resolved value by simply using the 'return' keyword within the async function
+// - we can access this resolved value using the 'then' method
+// - note that if any error happens in the try block before the return keyword, the return will never be reached because the code will immediately jump to the catch block
+// - for some reason this causes the promise returned from the async function to not be rejected, even if there was an error in the try block
+// - in other words, even if there is an error with the async function, the promise that the async function returns is still fulfilled and not rejected
+
+// The Confusing bit:
+// - in the case that the async function has an error, the catch block is what the 'then' method is expecting a value from.
+// - we have to explicitly throw an error here as well because the catch block should only be triggered if an error occurs, and it receives that error as an argument
+// - if we don't throw an error, the async function thinks that the catch block is returning a resolved value for its promise
+// - and since there is nothing explicitly returned in the catch block, the 'then' method receives a value of undefined
+// - so basically the async function still resolves and that means that the then method will still trigger, it will not go to the catch method because it doesn't think the promise was rejected
+
+// - now, if we throw an error in the catch block, we do so by using the argument that was passed to the catch block (which is the caught error from the async function)
+// - this is important because it allows us to use that information about the error and pass it forward to the catch method
+// -throwing the error at the end of the catch block causes the async functions promise to be rejected, which in turn will not trigger the 'then' method, but will trigger the 'catch' method
+// - we also have the added benefit of keeping the detailed error message
