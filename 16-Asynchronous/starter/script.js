@@ -32,6 +32,13 @@ const renderCountry = function (data, className = '') {
   countriesContainer.style.opacity = 1;
 };
 
+const getJSON = function (url, errorMsg = 'Something went wrong..') {
+  // Returning the result of the chain
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+    return response.json();
+  });
+};
 //////////////////////////////////////////////////
 /*
 
@@ -1062,7 +1069,7 @@ lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 
 // Promisifying the setTimeout function:
 
-const wait = function (seconds) {
+`const wait = function (seconds) {
   // Returning a promise:
   // - don't need to pass a reject argument in this case
   // - this is because it is impossible for a timer to fail
@@ -1071,7 +1078,7 @@ const wait = function (seconds) {
     // - all we want to happen at the end of the timer is for our promise to be resolved
     setTimeout(resolve, seconds * 1000);
   });
-};
+};`
 
 // We want something to happen after a timer of 2 seconds:
 wait(2)
@@ -1204,6 +1211,8 @@ createImage('./img/img-1.jpg')
 //   console.log(res)
 // ); // old way
 
+/*
+
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -1218,7 +1227,7 @@ const whereAmI = async function () {
     const pos = await getPosition();
     const { lattitude: lat, longitute: lng } = pos.coords;
 
-    // Reverse Geocodding
+    // Reverse Geocoding
     const resGeo = await fetch(
       `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
     );
@@ -1247,18 +1256,22 @@ const whereAmI = async function () {
     console.error(`${err}`);
     // Rendering error to UI for the user:
     renderError(`${err.message}`);
-    // Reject promise returned from async function:
+    // Reject promise returned from async function, returns the error to the function call:
     throw err;
   }
 };
 
 console.log('Getting location...');
+
 // whereAmI()
 //   .then(country => console.log(country))
 //   .catch(err => console.error(err.message))
 //   .finally(() => console.log('Finished getting location'));
 
 // Immediately invoking an async function expression:
+// - allows you to wrap the function implementation into a try/catch block
+// - also allows you to do this without having to create a whole new function
+// - allows you to avoid using the 'then', 'catch' and 'finally' methods
 (async function () {
   try {
     console.log(await whereAmI());
@@ -1268,12 +1281,14 @@ console.log('Getting location...');
   console.log('Finished getting location');
 })();
 
+*/
+
 // Inside an async function, we can have one or more 'await' statements:
-// - the await statements need a promise
+// - the await statements are used on asynchronous functions that return promises
 // - in this example, the fetch function will return a promise
 // - we use the await keyword to wait for the result of that promise
-// - the await keyword STOPS the execution of the function until the promise is resolved
-// - this is not a problem, since the function itself is executing asynchronously in the background
+// - the await keyword STOPS the execution of the async function until the promise of the asynchronous function is resolved
+// - this is not a problem, since the function we used await on itself is executing asynchronously in the background
 // - this doesn't block the main thread of execution
 // - once the promise is resolved, the value of the whole await expression is going to be the resolved value of the promise
 // - we can store this value in a variable
@@ -1305,8 +1320,168 @@ console.log('Getting location...');
 // - if we don't throw an error, the async function thinks that the catch block is returning a resolved value for its promise
 // - and since there is nothing explicitly returned in the catch block, the 'then' method receives a value of undefined
 // - so basically the async function still resolves and that means that the then method will still trigger, it will not go to the catch method because it doesn't think the promise was rejected
+// - this only happens when returning a value from an async function
 
 // - now, if we throw an error in the catch block, we do so by using the argument that was passed to the catch block (which is the caught error from the async function)
 // - this is important because it allows us to use that information about the error and pass it forward to the catch method
 // -throwing the error at the end of the catch block causes the async functions promise to be rejected, which in turn will not trigger the 'then' method, but will trigger the 'catch' method
 // - we also have the added benefit of keeping the detailed error message
+
+////////////////////////////////////
+
+/*
+
+const get3Countries = async function (c1, c2, c3) {
+  try {
+    // Handling unrelated asynchronous functions in sequence, wastes time - much slower:
+    // const [data1] = await getJSON(`https://restcountries.com/v3.1/name/${c1}`);
+    // const [data2] = await getJSON(`https://restcountries.com/v3.1/name/${c2}`);
+    // const [data3] = await getJSON(`https://restcountries.com/v3.1/name/${c3}`);
+    // console.log([data1.capital[0], data2.capital[0], data3.capital[0]]);
+
+    // Handling unrelated asynchronous data in parallel, much faster:
+    // - we use Promise.all, which is a promise combinator
+    // - allows us to pass an array of promises that run in parallel
+    // - returns an array of the resolved values, in this case, the json objects
+    // - when the promises don't rely on each other, its best to run them in parallel
+    const data = await Promise.all([
+      getJSON(`https://restcountries.com/v3.1/name/${c1}`),
+      getJSON(`https://restcountries.com/v3.1/name/${c2}`),
+      getJSON(`https://restcountries.com/v3.1/name/${c3}`),
+    ]);
+    // Accessing the values using the map method:
+    console.log(data.map(d => d[0].capital[0]));
+  } catch (err) {
+    console.log(err.message);
+  }
+};
+get3Countries('portugal', 'canada', 'tanzania');
+
+*/
+
+// Note:
+// - if any of the promises are rejected, the whole combinator gets rejected,  when this happens we say it short circuits
+// - if you are not using async/await, you can use the 'then' method to do the same thing
+// - but its probably better to just use the async function
+// - promise combinators allow us to combine multiple promises, there are multiple combinators
+
+// See video on combinators
+
+/////////////////////////////////////////////////////
+
+// Selecting elements we will use later:
+const imageContainer = document.querySelector('.images');
+
+// Creating the promisified createImage function:
+const createImage = function (imgPath) {
+  // Returning a promise:
+  return new Promise(function (resolve, reject) {
+    // Creating the new img element and giving it a src of the imgPath:
+    const img = document.createElement('img');
+    img.src = imgPath;
+
+    // Listening for the 'load' event from the img element:
+    img.addEventListener('load', function () {
+      // Adding the new element to the right div:
+      imageContainer.append(img);
+      // Resolving the promise, setting the resolved value to the new img element:
+      resolve(img);
+    });
+
+    // Listening for the 'error' event (from the img element?):
+    img.addEventListener('error', function () {
+      // Setting the resolved value to a new error with a specific error message:
+      reject(new Error(`Image couldn't load.. ⛔`));
+    });
+  });
+};
+
+// Creating the promisified wait function:
+const wait = function (seconds) {
+  // Returning a promise:
+  return new Promise(function (resolve) {
+    // Passing the resolve function to the timer as the call back, marks promise as resolved:
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+// Testing
+// createImage('./img/img-1.jpg');
+
+const loadNPause = async function () {
+  try {
+    // Creating the first image, waiting then hiding:
+    let newImg = await createImage('./img/img-1.jp');
+    console.log(newImg);
+    await wait(2);
+    newImg.style.display = 'none';
+
+    // Creating the second image, waiting then hiding:
+    newImg = await createImage('./img/img-2.jpg');
+    await wait(2);
+    newImg.style.display = 'none';
+
+    // Catching the errors
+  } catch (err) {
+    console.error(err);
+    renderError(err.message);
+    // throw err; // This is only needed if we are expecting a returned value from the try block
+  }
+};
+
+// Testing:
+// loadNPause(); //WHY DOESN'T THIS WORK THOUGH???????????????? Uncaught promise.... how???????
+// loadNPause().catch(err => console.error(err));  // so I did this to fix it... but must be another way
+
+// Creating the load all async function:
+const loadAll = async function (imgArr) {
+  try {
+    // Looping through the passed array:
+    const newArr = imgArr.map(async imgPath => await createImage(imgPath));
+    // Async callback only gave the map method unsettled promises:
+    console.log(newArr);
+    // We 'await' the 'all' combinator and pass the new array in order to receive the settled values of each index of the array of promises:
+    const newArrEl = await Promise.all(newArr);
+    console.log(newArrEl);
+
+    // Doing something with the resolved values of the array of promises:
+    newArrEl.forEach(img => img.classList.add('parallel'));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const imgArr = ['./img/img-1.jpg', './img/img-2.jpg', './img/img-3.jpg'];
+
+// Testing:
+loadAll(imgArr);
+
+// Weird bits:
+
+// Looping through the passed array:
+// - callback for the map method is an async function
+// - this allows us to use await within the callback
+// - however, async functions always return a promise
+// - so the new array that the map method produces will be composed of 3 promises if we console log it
+// - we can't really work with these values in this condition
+
+// We 'await' the 'all' combinator and pass the new array in order to receive the settled values of each index of the array of promises:
+// - since the map method used an async callback, it returned promises for each of the new arrays indexes instead of actual values
+// - we want the settled values of these promises so that we can actually work with them
+// - so what we do is use the Promise.all combinator, which takes an array of promises and runs them in parallel
+// - we await this combinator and store the values in a new variable
+// - this pauses execution until all of the promises in the array are fulfilled OR until one of them has an error
+//
+
+// FOR SOME REASON WE DON"T NEED TO USE THE CATCH METHOD AFTER WE CALL LOADALL, BUT WE DO WHEN WE CALL LOADNPAUSE.. I HAVE SEARCHED FOR A LONG TIME AND HAVE NOT FOUND THE REASON FOR THIS
+// - note that you only need to throw an error in situations where there is also a possible return value
+// - for example, if you have a promisified function that returns a value if successful, you should also return a new error if that function fails
+// - or if you have an asyc function with a try block that you expect to return a value on success, you should also throw an error in the catch block
+// - what I mean is, if you want a resolved value from an async function/promise, and you want to handle this resolved value...
+// - .. by either using the 'then' method or by calling the async function within an IIFE..... aka you are expecting a value
+// - you must also throw an error for the cases where this function/promise fails
+// - this is because an async function always returns a promise.. meaning that it is always seen as resolved - even if an error occurs
+// - that means that it will always enter the try/then blocks... even with an error
+// - in order for this to not happen, we have to throw an error.
+// - this allows the promise to return an error/rejected promise and therefor skip the try/then blocks and go straight to the catch block/catch method.
+// - this means that any errors that happen within the async function will actually be caught, instead of that weird uncaught error that we kept getting
