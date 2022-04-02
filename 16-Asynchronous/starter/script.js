@@ -1378,6 +1378,7 @@ const createImage = function (imgPath) {
   return new Promise(function (resolve, reject) {
     // Creating the new img element and giving it a src of the imgPath:
     const img = document.createElement('img');
+    // Asychronous operation, once finished - emits a load event:
     img.src = imgPath;
 
     // Listening for the 'load' event from the img element:
@@ -1403,6 +1404,23 @@ const wait = function (seconds) {
     // Passing the resolve function to the timer as the call back, marks promise as resolved:
     setTimeout(resolve, seconds * 1000);
   });
+};
+
+// Creating the waitCounter function:
+const waitCounter = async function (seconds, string) {
+  try {
+    if (typeof seconds !== 'number') new error('Not a number');
+
+    for (let i = seconds; i > 0; i--) {
+      console.log(`${i} seconds until gone...`);
+      await wait(1);
+    }
+    console.log(string);
+  } catch (err) {
+    console.log(err.message);
+    renderError(err.message);
+    throw err;
+  }
 };
 
 // Testing
@@ -1432,6 +1450,7 @@ const loadNPause = async function () {
 // Testing:
 // loadNPause(); //WHY DOESN'T THIS WORK THOUGH???????????????? Uncaught promise.... how???????
 // loadNPause().catch(err => console.error(err));  // so I did this to fix it... but must be another way
+// FIXED IT!!!! YEAAAH - keeping these comments here to remember the pain, explained how to do it below
 
 // Creating the load all async function:
 const loadAll = async function (imgArr) {
@@ -1454,7 +1473,7 @@ const loadAll = async function (imgArr) {
 const imgArr = ['./img/img-1.jpg', './img/img-2.jpg', './img/img-3.jpg'];
 
 // Testing:
-loadAll(imgArr);
+// loadAll(imgArr);
 
 // Weird bits:
 
@@ -1485,3 +1504,13 @@ loadAll(imgArr);
 // - in order for this to not happen, we have to throw an error.
 // - this allows the promise to return an error/rejected promise and therefor skip the try/then blocks and go straight to the catch block/catch method.
 // - this means that any errors that happen within the async function will actually be caught, instead of that weird uncaught error that we kept getting
+
+// Notes:
+// - when you know you have to execute multiple asychrnous/promisified functions within a function - its a good idea to make that an async function
+// - in other words, if you need to chain a promise after another promise.. or multiple promises in a chain.. use an async function to execute this
+// - this allows you to avoid call backhell
+// - also allows you to avoid having to use the .then and .catch methods, or having to return promises in order to use those methods
+// - results in much cleaner code that looks synchronous, even though it is executing asynchronously in the background
+// - it also automatically returns a promise, always - good to remember this
+
+// Other Combinators
