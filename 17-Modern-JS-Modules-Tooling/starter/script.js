@@ -30,6 +30,7 @@ console.log(ShoppingCart.totalPrice);
 
 // /*
 import add, { cart } from './shoppingCart.js';
+import cloneDeep from 'lodash-es/cloneDeep';
 add('pizza', 2);
 add('bread', 5);
 add('apples', 4);
@@ -47,10 +48,26 @@ console.log(cart);
 // - also note that the main script will wait for any blocking code from any of it's dependencies to execute before it starts executing it's own code
 // - top level await is very useful, but we should be careful when using it because of the fact that it blocks code execution
 
-console.log('Start fetching');
-const res = await fetch('https://jsonplaceholder.typicode.com/posts');
-const data = await res.json();
-console.log('Something');
+// console.log('Start fetching');
+// const res = await fetch('https://jsonplaceholder.typicode.com/posts');
+// const data = await res.json();
+// console.log('Something');
+
+let cloneMe = [
+  { one: 'hi', two: 'bye' },
+  { one: 'hello', two: 'goodbye', three: { test: true } },
+];
+
+let shallowClone = {};
+shallowClone = Object.assign(cloneMe, shallowClone);
+
+let deepClone = cloneDeep(cloneMe);
+//
+cloneMe[1].three.test = false;
+
+console.log(cloneMe[1].three.test);
+console.log(shallowClone[1].three.test);
+console.log(deepClone[1].three.test);
 
 // */
 
@@ -60,4 +77,4 @@ console.log('Something');
 // - all modules are executed in strict mode by default, no need to include that line of code
 // - before any of the main modules code is executed, any importaed modules code is executed first
 //  - all variables defined in a module are private to that module
-// - if we want to use varualbes from one module in another, we would have to use exports
+// - if we want to use varialbes from one module in another, we would have to use exports
