@@ -31,6 +31,9 @@ console.log(ShoppingCart.totalPrice);
 // /*
 import add, { cart } from './shoppingCart.js';
 import cloneDeep from 'lodash-es/cloneDeep';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+
 add('pizza', 2);
 add('bread', 5);
 add('apples', 4);
@@ -68,6 +71,8 @@ cloneMe[1].three.test = false;
 console.log(cloneMe[1].three.test);
 console.log(shallowClone[1].three.test);
 console.log(deepClone[1].three.test);
+
+Promise.resolve('test').then(x => console.log(x));
 
 // */
 
