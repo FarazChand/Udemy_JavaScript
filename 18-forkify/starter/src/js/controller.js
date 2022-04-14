@@ -12,7 +12,7 @@ import 'regenerator-runtime/runtime';
 // }
 /////////////////////////////////////////////////
 
-// console.log('Live server test');
+console.log('Live server test');
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////
@@ -29,6 +29,7 @@ const controlRecipes = async function () {
 
     // 2) Rendering recipe:
     recipeView.render(model.state.recipe);
+    console.log(recipeView._data.servings);
 
     // Catch Errors
   } catch (err) {
@@ -68,8 +69,17 @@ const controlPagination = function (goToPage) {
   paginationView.render(model.state.search);
 };
 
+const controlServings = function (newServings) {
+  // Update the recipe servings (in state)
+  model.updateServings(newServings);
+
+  // Update the recipe view
+  recipeView.render(model.state.recipe);
+};
+
 const init = function () {
   recipeView.addHandlerRender(controlRecipes);
+  recipeView.addHandlerUpdateServings(controlServings);
   searchView.addHandlerSearch(controlSearchResults);
   paginationView.addHandlerClick(controlPagination);
 };
