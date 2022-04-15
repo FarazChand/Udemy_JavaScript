@@ -13,6 +13,7 @@ import 'regenerator-runtime/runtime';
 /////////////////////////////////////////////////
 
 // console.log('Live server test');
+// console.log('Live server test2');
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////
@@ -53,8 +54,9 @@ const controlSearchResults = async function () {
     // 2) Load search results
     await model.loadSearchResults(query);
 
-    // 3) Render results
+    // 3) Render results to first Page
     // resultsView.render(model.state.search.results);
+    model.resetPageValue();
     resultsView.render(model.getSearchResultsPage());
 
     // 4) Render initial pagination buttons

@@ -1,0 +1,78 @@
+Important things to note:
+- This application uses the MVC architecture
+- We have the html and css as normal, except I believe that the css is split up into sections as well, which I have not dived into as of yet
+- We split up the JS into three main sections: model, controller and view
+- the controller is the main execution module, where all other modules are imported to. It acts as a middle man between the model and the view
+- the view is split up into many different modules, each based on a specific section of the page that will be rendered
+- all of the view modules are child classes of the main view module
+
+- it's important to note that all of the view modules contain a class which is a child class of the main view module
+- these modules create an instance within the module which is then exported to the main controller module
+- this is how we have access to the different view methods
+
+
+
+If we run through the execution of the application, the events unfold somewhat like this:
+
+After all dependencies have been imported and parsing has been completed...
+
+The init function in controller.js executes:
+- this function is used to establish the event listeners to the page
+- this is done by accessing the specific view object and using its method to 
+
+
+
+
+model.loadSearchResults(query)
+-------------------------------
+- takes a query as an argument
+- saves the argument's value in the modules state object
+- calls the getJSON helper function, passing the api URL + the query as an argument, which returns an object with the results of the query search
+- takes the returned object of data, accesses the array that holds the recipe data, loops over it using the map method:
+	- for every recipe, we create a new object with the same data, but renamed in camelCase in order to adhere to JS conventions
+	- we return this and store it into the 'results' array, which is contained the 'search' property of the modules 'state' object
+	- we do this so that we can access this array of results in the controller module
+
+
+Now that we have all the results for the query, we can display them, however, we don't want to display all of them. This would make the application
+look sloppy. Instead, we want to display one page at a time. One page in this application is defined to have 10 results. After searching for a query,
+we want to dispay the first page of the results by default:
+
+model.getSearchResultsPage(page = state.search.page)
+----------------------------------------------------
+- takes the page number of the search result we want to render and uses it as an argument
+- the default page number is passed as an argument as a default, which is contained in the module's 'state' object 
+- the passed argument then overwrites the current page number value in the module's state object
+- note that all results are stored int the modules 'state' object, in the search>results array, but we only want results for the specified page
+- we then do some simple math to get the 'start' and 'end' values of that pages results:	
+	- to get the 'start' value, we take the page value, subtract 1, then multiply it by the 'resultsPerPage' constant
+	- to get the 'end' value, we take the page value, then multiply it by the 'resultsPerPage' constant
+	- Why do we do it this way? 
+	- (Explain in detail later)
+	- basically, this allows you to get the first index and the last index of the specified page
+- once we have the 'start' and 'end' values, we can use the 'slice' method to extract an array containing all the results on the desired page
+- we then return this array of extracted results
+
+
+Now that we have the extracted array of results for the desired page (first page by default), we want to render these results onto the page in their
+designated view. 
+
+
+results.render(model.getSearchResultsPage());
+---------------------------------------------
+- note that we call the getSearchResultsPage function within the argument of this method. 
+- basically, we are taking the returned value of that function and passing it as an argument to the render function - the value being the 10 results of the first page
+- also note that the 'results.render(data)' method is inherited from the parent 'view' module's exported class, so the implementation is contained there
+- since it is inherited, we still have access to in on the 'resultsView' instance
+
+- this method takes an array OR an object as an object
+- we have a gaurd clause that checks if the data exists, or if it is an empty array, if it doesn't pass, we return immediately
+- in this case, we are passing the value returned from the model.getSearchResultsPage method, which is the extracted array of results for the first page of the search
+- it takes this array and stores it into the 'resultsView' instances '_data' property
+- it then uses the 'resultsView' method called '_generateMarkup'
+	- note that '_generateMarkup' is a method that most of the child view classes use... however
+	- they all have different variations of this method tailored specifically for their parent element and data
+
+- after the markup is generated, it is stored into a variable called markup
+- then the clear method is called, which simply clears all of the inner HTML of the parent element of the class (overwriting the spinner)
+- finally the markup is inserted to the parent element, rendering the desired page of results to the appication UI

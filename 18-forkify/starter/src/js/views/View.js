@@ -25,7 +25,7 @@ export default class View {
       const curEl = curElements[i];
       // console.log(curEl, newEl, newEl.isEqualNode(curEl));
 
-      // Updates changed TEXT
+      // Updates changed TEXT (for servings)
       if (
         !newEl.isEqualNode(curEl) &&
         newEl.firstChild?.nodeValue.trim() !== ''
@@ -33,11 +33,11 @@ export default class View {
         curEl.textContent = newEl.textContent;
       }
 
-      // Updates changed ATTRIBUTE
+      // Updates changed ATTRIBUTE (for selected recipe and possibly servings)
       if (!newEl.isEqualNode(curEl)) {
-        Array.from(newEl.attributes).forEach(attr =>
-          curEl.setAttribute(attr.name, attr.value)
-        );
+        Array.from(newEl.attributes).forEach(attr => {
+          curEl.setAttribute(attr.name, attr.value);
+        });
       }
     });
   }
